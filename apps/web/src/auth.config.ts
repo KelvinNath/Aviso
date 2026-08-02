@@ -7,9 +7,10 @@ import type { NextAuthConfig } from "next-auth";
  * without importing Node-only modules (e.g. future Prisma adapter).
  */
 export const authConfig = {
+  secret: process.env.AUTH_SECRET,
   providers: [],
   pages: {
-    signIn: "/api/auth/signin",
+    signIn: "/signin",
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {

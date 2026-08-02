@@ -8,6 +8,9 @@ import {
   getWelcomeMessage,
 } from "./bot-content.js";
 import {
+  linkTelegramAccountWithCode,
+} from "./telegram-link.service.js";
+import {
   buildSubscribeSuccessMessage,
   subscribeToJeeMain,
 } from "./telegram-subscribe.service.js";
@@ -40,13 +43,45 @@ function getCommand(text: string | undefined): string | null {
     return null;
   }
 
-  return text.trim().split(/\s+/)[0] ?? null;
+  return text.trim().split(/\s+/)[0]?.split("@")[0] ?? null;
+}
+
+function parseStartPayload(text: string): string | null {
+  const trimmed = text.trim();
+  const [commandToken, ...rest] = trimmed.split(/\s+/);
+  const command = commandToken?.split("@")[0];
+
+  if (command !== "/start") {
+    return null;
+  }
+
+  const payload = rest.join(" ").trim();
+  return payload.length > 0 ? payload : null;
 }
 
 async function handleStartCommand(
   chatId: number,
   telegramUser: NonNullable<NonNullable<TelegramUpdate["message"]>["from"]>,
+  linkCode: string | null,
 ): Promise<void> {
+  if (linkCode) {
+    const result = await linkTelegramAccountWithCode(
+      linkCode,
+      telegramUser,
+      chatId,
+    );
+
+    await sendMessage(String(chatId), result.message);
+
+    if (result.status === "success") {
+      console.log(
+        `[bot] Linked Telegram ${telegramUser.username ?? telegramUser.id} via deep link`,
+      );
+    }
+
+    return;
+  }
+
   await upsertTelegramUser(telegramUser, chatId);
   await sendMessage(String(chatId), getWelcomeMessage(), "MarkdownV2");
 
@@ -134,9 +169,10 @@ async function handleUpdate(update: TelegramUpdate): Promise<void> {
   }
 
   const command = getCommand(message.text);
+  const startPayload = parseStartPayload(text);
 
   if (command === "/start") {
-    await handleStartCommand(message.chat.id, telegramUser);
+    await handleStartCommand(message.chat.id, telegramUser, startPayload);
     return;
   }
 

@@ -1,26 +1,196 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #111111;
+
+  /* Brand palette */
+  --aviso-purple: #6d28ff;
+  --aviso-blue: #2563ff;
+  --aviso-lime: #c7ff3d;
+  --aviso-yellow: #ffe600;
+  --aviso-coral: #ff6b6b;
+  --aviso-sky: #73d9ff;
+  --aviso-light: #fafafa;
+  --aviso-dark: #111111;
+
+  /* Borders & shadows */
+  --border-width: 2px;
+  --border-color: #111111;
+  --shadow-brutal-sm: 2px 2px 0 0 var(--border-color);
+  --shadow-brutal: 4px 4px 0 0 var(--border-color);
+  --shadow-brutal-lg: 6px 6px 0 0 var(--border-color);
+
+  /* Radius */
+  --radius-chunky: 1rem;
+  --radius-sticker: 1.25rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-aviso-purple: var(--aviso-purple);
+  --color-aviso-blue: var(--aviso-blue);
+  --color-aviso-lime: var(--aviso-lime);
+  --color-aviso-yellow: var(--aviso-yellow);
+  --color-aviso-coral: var(--aviso-coral);
+  --color-aviso-sky: var(--aviso-sky);
+  --color-aviso-light: var(--aviso-light);
+  --color-aviso-dark: var(--aviso-dark);
+
+  --font-heading: var(--font-bricolage), system-ui, sans-serif;
+  --font-body: var(--font-manrope), system-ui, sans-serif;
+
+  --radius-chunky: var(--radius-chunky);
+  --radius-sticker: var(--radius-sticker);
+
+  --shadow-brutal-sm: var(--shadow-brutal-sm);
+  --shadow-brutal: var(--shadow-brutal);
+  --shadow-brutal-lg: var(--shadow-brutal-lg);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark {
+  --background: #111111;
+  --foreground: #fafafa;
+  --border-color: #fafafa;
+  --shadow-brutal-sm: 2px 2px 0 0 #fafafa;
+  --shadow-brutal: 4px 4px 0 0 #fafafa;
+  --shadow-brutal-lg: 6px 6px 0 0 #fafafa;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* Utility classes for brutalist styling */
+.brutal-border {
+  border: var(--border-width) solid var(--border-color);
+}
+
+.brutal-shadow {
+  box-shadow: var(--shadow-brutal);
+}
+
+.brutal-shadow-sm {
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+.brutal-shadow-lg {
+  box-shadow: var(--shadow-brutal-lg);
+}
+
+/* Interactive bounce on hover (respects reduced motion via media query above) */
+.hover-bounce {
+  transition: transform 150ms ease;
+}
+
+.hover-bounce:hover {
+  transform: scale(1.03);
+}
+
+.hover-bounce:active {
+  transform: scale(0.98);
+}
+
+/* Sticker tilt variants */
+.tilt-left {
+  transform: rotate(-2deg);
+}
+
+.tilt-right {
+  transform: rotate(2deg);
+}
+
+/* Highlighter stroke behind text */
+.highlighter-lime {
+  background: linear-gradient(
+    to top,
+    var(--aviso-lime) 40%,
+    transparent 40%
+  );
+}
+
+.highlighter-yellow {
+  background: linear-gradient(
+    to top,
+    var(--aviso-yellow) 40%,
+    transparent 40%
+  );
+}
+
+/* Keyframe utilities */
+@keyframes float-gentle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes wiggle-soft {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 5s ease-in-out infinite;
+}
+
+.animate-wiggle-soft {
+  animation: wiggle-soft 2.5s ease-in-out infinite;
+}
+
+/* Accessibility — visible focus for keyboard users */
+:focus-visible {
+  outline: 3px solid var(--aviso-lime);
+  outline-offset: 3px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--aviso-lime);
+  outline-offset: 3px;
 }

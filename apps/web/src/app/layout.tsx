@@ -1,20 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+
+import { SkipLink } from "@/components/layout/skip-link";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { ThemeScript } from "@/components/theme/theme-script";
+import { bodyFont, headingFont } from "@/lib/fonts";
+import { createMetadata } from "@/lib/seo";
+
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+export const metadata: Metadata = createMetadata();
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Aviso",
-  description: "Exam notification platform for engineering entrance exams",
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#111111" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -23,11 +25,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${headingFont.variable} ${bodyFont.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider>
+          <SkipLink />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -44,6 +44,8 @@ const userProfileSelect = {
   displayName: true,
   avatarUrl: true,
   telegramChatId: true,
+  telegramUserId: true,
+  telegramUsername: true,
   preferredChannel: true,
 } as const;
 

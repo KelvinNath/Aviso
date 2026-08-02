@@ -10,10 +10,11 @@ import { findOrCreateUser } from "@/services/user.service";
  * Exports handlers (API routes), signIn/signOut helpers, and the auth()
  * function for reading the session in Server Components and Route Handlers.
  *
- * Uses JWT sessions. On each session read, the user is synced to the database
- * via findOrCreateUser() and session.user.id is set to the database User.id.
+ * Uses JWT sessions. On sign-in, the user is synced to the database via
+ * findOrCreateUser() in the jwt callback; session.user.id comes from the token.
  */
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   ...authConfig,
   providers: [
     Google({
@@ -25,18 +26,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async session({ session }) {
-      if (!session.user?.email) {
-        return session;
+    ...authConfig.callbacks,
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`;
+    },
+    async jwt({ token, user }) {
+      if (user?.email) {
+        const dbUser = await findOrCreateUser({
+          email: user.email,
+          displayName: user.name ?? null,
+          avatarUrl: user.image ?? null,
+        });
+        token.sub = dbUser.id;
       }
 
-      const dbUser = await findOrCreateUser({
-        email: session.user.email,
-        displayName: session.user.name ?? null,
-        avatarUrl: session.user.image ?? null,
-      });
-
-      session.user.id = dbUser.id;
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
+      }
 
       return session;
     },

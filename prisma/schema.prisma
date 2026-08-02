@@ -88,14 +88,18 @@ model Event {
 }
 
 model User {
-  id               String              @id @default(cuid())
-  displayName      String?
-  email            String              @unique
-  avatarUrl        String?
-  telegramChatId   String?
-  preferredChannel NotificationChannel
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  id                 String              @id @default(cuid())
+  displayName        String?
+  email              String              @unique
+  avatarUrl          String?
+  telegramChatId     String?
+  telegramUserId     String?
+  telegramUsername   String?
+  linkCode           String?             @unique
+  linkCodeExpiresAt  DateTime?
+  preferredChannel   NotificationChannel
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   subscriptions Subscription[]
 }

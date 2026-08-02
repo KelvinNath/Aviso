@@ -11,7 +11,6 @@ import {
 const VALID_EVENT_TYPES = new Set<string>(Object.values(EventType));
 
 type SubscriptionRequestBody = {
-  userId: string;
   examId: string;
   eventTypes: EventType[];
 };
@@ -45,11 +44,16 @@ export async function GET() {
 /**
  * POST /api/subscriptions
  *
- * Creates a subscription linking a user to an exam with event type preferences.
- * No authentication in this sprint — userId is supplied in the request body.
+ * Creates a subscription linking the authenticated user to an exam.
  */
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     let body: unknown;
     try {
       body = await request.json();
@@ -62,10 +66,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    const { userId, examId, eventTypes } = body as SubscriptionRequestBody;
+    const { examId, eventTypes } = body as SubscriptionRequestBody;
 
     const subscription = await createSubscription({
-      userId,
+      userId: session.user.id,
       examId,
       eventTypes,
     });
@@ -96,14 +100,10 @@ export async function POST(request: Request) {
  */
 function validateSubscriptionBody(body: unknown): string | null {
   if (typeof body !== "object" || body === null) {
-    return "Missing required fields: userId, examId, eventTypes";
+    return "Missing required fields: examId, eventTypes";
   }
 
-  const { userId, examId, eventTypes } = body as Record<string, unknown>;
-
-  if (typeof userId !== "string" || userId.trim() === "") {
-    return "Missing required field: userId";
-  }
+  const { examId, eventTypes } = body as Record<string, unknown>;
 
   if (typeof examId !== "string" || examId.trim() === "") {
     return "Missing required field: examId";
