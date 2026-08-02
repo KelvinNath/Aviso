@@ -13,7 +13,8 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules/.cache",
     "db:generate": "prisma generate",
-    "db:validate": "prisma validate"
+    "db:validate": "prisma validate",
+    "bot": "npm run bot --workspace=@aviso/crawler"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0"

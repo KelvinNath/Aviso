@@ -1,23 +1,39 @@
+import { createNotificationsForEvent } from "../services/notification.service.js";
+import { ingestEvents } from "../services/event.service.js";
 import { getParser } from "./parser.factory.js";
-import type { ParsedEvent } from "./types/parsed-event.js";
 
 export type ExamSourceInput = {
+  examId: string;
+  examSourceId: string;
   examSlug: string;
+  examName: string;
   url: string;
 };
+
+export type CrawlStatistics = {
+  parsedEvents: number;
+  newEvents: number;
+  notificationsQueued: number;
+};
+
+const emptyStatistics = (): CrawlStatistics => ({
+  parsedEvents: 0,
+  newEvents: 0,
+  notificationsQueued: 0,
+});
 
 /**
  * Orchestrates crawling for a single exam source.
  *
  * Flow:
- * 1. Receive exam source metadata
- * 2. Fetch HTML from the source URL
- * 3. Obtain the parser for the exam slug
- * 4. Parse the HTML into normalized events
+ * 1. Fetch HTML from the source URL
+ * 2. Parse into normalized events
+ * 3. Ingest new events into the database
+ * 4. Queue pending notifications for each new event
  */
 export async function crawlExamSource(
   source: ExamSourceInput,
-): Promise<ParsedEvent[]> {
+): Promise<CrawlStatistics> {
   try {
     const response = await fetch(source.url);
 
@@ -27,12 +43,39 @@ export async function crawlExamSource(
 
     const html = await response.text();
     const parser = getParser(source.examSlug);
+    const parsedEvents = parser.parse(html);
 
-    return parser.parse(html);
+    const newEvents = await ingestEvents(
+      source.examId,
+      source.examSourceId,
+      parsedEvents,
+    );
+
+    let notificationsQueued = 0;
+
+    for (const event of newEvents) {
+      const { createdCount } = await createNotificationsForEvent(event);
+      notificationsQueued += createdCount;
+    }
+
+    const statistics: CrawlStatistics = {
+      parsedEvents: parsedEvents.length,
+      newEvents: newEvents.length,
+      notificationsQueued,
+    };
+
+    console.log(`[crawler] Exam: ${source.examName}`);
+    console.log(`[crawler] Parsed events: ${statistics.parsedEvents}`);
+    console.log(`[crawler] New events: ${statistics.newEvents}`);
+    console.log(
+      `[crawler] Notifications queued: ${statistics.notificationsQueued}`,
+    );
+
+    return statistics;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[crawler] Failed to fetch ${source.url}: ${message}`);
+    console.error(`[crawler] Failed to crawl ${source.url}: ${message}`);
 
-    return [];
+    return emptyStatistics();
   }
 }

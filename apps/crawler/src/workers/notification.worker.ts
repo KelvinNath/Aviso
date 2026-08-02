@@ -1,6 +1,7 @@
 import { NotificationStatus } from "@prisma/client";
 
 import { sendMessage } from "../adapters/telegram.adapter.js";
+import { formatTelegramNotification } from "../bot/telegram-message-formatter.js";
 import { prisma } from "../lib/prisma.js";
 
 /**
@@ -31,10 +32,9 @@ export async function processPendingNotifications(): Promise<void> {
         throw new Error("User has no telegramChatId");
       }
 
-      const recipientName = user.displayName ?? user.email;
-      const message = `Sending notification to ${recipientName}\nEvent: ${event.title}`;
+      const message = formatTelegramNotification(event);
 
-      await sendMessage(user.telegramChatId, message);
+      await sendMessage(user.telegramChatId, message, "MarkdownV2");
 
       await prisma.notification.update({
         where: { id: notification.id },

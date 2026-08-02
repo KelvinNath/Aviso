@@ -1,5 +1,3 @@
-function main(): void {
-  console.log("Aviso crawler");
-}
+import { startScheduler } from "./scheduler/scheduler.js";
 
-main();
+startScheduler();
