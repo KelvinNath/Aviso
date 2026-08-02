@@ -4,260 +4,73 @@
 
 **Official information. Unofficial personality.**
 
-Aviso should feel like a bold, fun productivity brand for students---not
-a government portal, not an AI startup, and not a coaching website.
+Aviso should feel like a bold, fun productivity brand for students — not a government portal, not an AI startup, and not a coaching website.
 
-## Brand Personality
+## Brand personality
 
--   Playful but trustworthy
--   Bold and energetic
--   Student-first
--   Friendly, witty microcopy
--   Clean information hierarchy
+- Playful but trustworthy
+- Bold and energetic
+- Student-first
+- Friendly, witty microcopy
+- Clean information hierarchy
 
-## Target Audience
+**One-line summary:** A productivity app disguised as a fun student brand.
 
-Students (16--24 years) who want fast, official updates without
-constantly checking exam websites.
+## Target audience
 
-## Visual Direction
+Students (16–24) who want fast, official updates without constantly checking exam websites.
 
--   Bright UI with optional dark mode
--   Neon accents
--   Thick rounded borders
--   Sticker-like cards
--   Doodles and playful illustrations
--   Smooth motion and microinteractions
+## What Aviso is not
 
-Avoid generic SaaS, AI gradients, and government-portal aesthetics.
+| Avoid | Examples |
+|-------|----------|
+| AI startup aesthetic | Dark gradients, glassmorphism, neural network hero art |
+| EdTech coaching look | BYJU'S, Vedantu, cartoon school vibes |
+| Generic SaaS | Inter everywhere, blue rectangles, flat corporate cards |
+| Government portal | Dense tables, zero personality, grey forms |
 
-## Color Palette
+## Visual direction
 
--   Purple: #6D28FF
--   Blue: #2563FF
--   Lime: #C7FF3D
--   Yellow: #FFE600
--   Coral: #FF6B6B
--   Sky: #73D9FF
--   Light: #FAFAFA
--   Dark: #111111
+- Bright UI with optional dark mode
+- Neon accents on warm beige (light) / near-black (dark)
+- Thick rounded borders (neo-brutalist)
+- Sticker-like cards with hard shadows
+- Doodles and playful illustrations
+- Smooth motion and microinteractions (Framer Motion)
+
+References: Figma Config, Duolingo energy, Pitch.com bold type, modern Webflow award sites.
+
+---
+
+## Color palette
+
+Implemented in `apps/web/src/app/globals.css`.
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| Purple | `#6D28FF` | Accents, CTA sections |
+| Blue | `#2563FF` | Links, secondary accents |
+| Lime | `#C7FF3D` | Primary buttons, focus rings, success |
+| Yellow | `#FFE600` | Highlights, Telegram card |
+| Coral | `#FF6B6B` | Errors, warnings, "not connected" |
+| Sky | `#73D9FF` | Info cards, badges |
+| Light (beige) | `#F5F0E8` | Light mode background and surfaces |
+| Dark | `#111111` | Text, borders, dark mode background |
+
+Light mode uses **warm beige** (`#F5F0E8`), not pure white. Dark mode inverts with light borders and `#111111` backgrounds.
+
+---
 
 ## Typography
 
-Headings: - Bricolage Grotesque - Clash Display - Cabinet Grotesk
+| Role | Font | Weights |
+|------|------|---------|
+| Headings | Bricolage Grotesque | 700 (bold uppercase for display) |
+| Body | Manrope | 400–600 |
 
-Body: - Inter - Manrope
+Configured in `apps/web/src/lib/fonts.ts`. Avoid using Inter as the primary face.
 
-## UI Style
-
--   Chunky buttons
--   Rounded cards
--   Sticker feel
--   Playful icons
--   Light comic-inspired illustrations
-
-## Copywriting
-
-Examples: - "Stop refreshing NTA every 15 minutes." - "We'll remember
-the deadlines. You remember the syllabus." - "Nothing exploded today.
-You're safe." - "Peaceful day. We'll wake you when NTA does."
-
-Professional, witty, never cringe.
-
-## Landing Page
-
-1.  Hero
-2.  Supported Exams
-3.  How Aviso Works
-4.  Features
-5.  Telegram Preview
-6.  Testimonials
-7.  FAQ
-8.  CTA
-
-## Product Philosophy
-
-Website = Control Center Telegram = Delivery Channel
-
-Website manages subscriptions and preferences. Telegram delivers
-official notifications.
-
-## Brand Promise
-
-We remember the deadlines. You remember the syllabus.
-
-## Identity
-
-Aviso is a productivity app disguised as a fun student brand.
-
-
-
-Absolutely. I think we've finally converged on the right direction.
-
-From everything you've shown me, I **wouldn't** describe Aviso as an "AI startup website."
-
-I'd describe it as:
-
-> **A bold, playful productivity brand for students.**
-
-That's a very different design language.
-
----
-
-## The vibe I understand
-
-### ❌ Not this
-
-* Dark AI gradients
-* Floating neural networks
-* Blue glassmorphism everywhere
-* Generic SaaS cards
-* Corporate fonts
-
-Basically...
-
-OpenAI
-Perplexity
-Cursor
-Anthropic
-
-No.
-
----
-
-### ❌ Also not
-
-A childish education website.
-
-Not BYJU'S.
-
-Not Vedantu.
-
-Not cartoon school.
-
----
-
-### ✅ Instead
-
-A mix of
-
-* Linear illustrations
-* Comic elements
-* Big typography
-* Thick borders
-* Neon accents
-* Doodles
-* Stickers
-* Motion
-* Slight chaos
-* Huge personality
-
-Think
-
-* Figma Config
-* Duolingo
-* LottieFiles
-* Pitch.com
-* Framer templates
-* Modern Webflow award sites
-
----
-
-# Colors
-
-Exactly.
-
-Not pastel.
-
-Not muted.
-
-Go **Neon**.
-
-Example palette
-
-Neon Purple
-
-```
-#6D28FF
-```
-
-Electric Blue
-
-```
-#2563FF
-```
-
-Lime
-
-```
-#C7FF3D
-```
-
-Neon Yellow
-
-```
-#FFE600
-```
-
-Coral
-
-```
-#FF6B6B
-```
-
-Sky
-
-```
-#73D9FF
-```
-
-White
-
-```
-#FAFAFA
-```
-
-Black
-
-```
-#111111
-```
-
-Lots of white space.
-
-Huge contrast.
-
----
-
-# Typography
-
-This is honestly one of the biggest branding opportunities.
-
-Avoid
-
-Inter everywhere.
-
-Instead
-
-Headings
-
-* Bricolage Grotesque ⭐⭐⭐⭐⭐
-* Clash Display
-* Cabinet Grotesk
-* General Sans
-* Satoshi
-
-Body
-
-Inter
-
-or
-
-Manrope
-
----
-
-Hero
+### Hero example
 
 ```
 Stop refreshing
@@ -265,292 +78,142 @@ NTA every
 15 minutes.
 ```
 
-instead of
-
-```
-Never miss an update.
-```
+Not: *"Never miss an update."*
 
 ---
 
-# Shapes
+## UI style
 
-Nothing should feel "perfect."
+- Chunky buttons with brutal borders and offset shadows
+- Rounded cards (`rounded-sticker`, `rounded-chunky`)
+- Sticker feel — optional subtle tilt on marketing cards
+- Playful icons, doodles, emoji in copy
+- Highlighter strokes behind key words (`.highlighter-lime`, `.highlighter-yellow`)
 
-Rounded rectangles.
+### Cards
 
-Sticker cards.
+Magazine-style variation — different colors, heights, optional 2° tilt on landing. Dashboard cards use straight alignment for readability.
 
-Scribbles.
+### Buttons
 
-Stars.
-
-Arrows.
-
-Emoji.
-
-Highlighter strokes.
-
-Underlines.
-
-Tiny floating icons.
-
----
-
-# Cards
-
-Not
-
-```
-┌─────────────┐
-│ Icon        │
-│ Heading     │
-│ Description │
-└─────────────┘
-```
-
-Instead
-
-Almost magazine style.
-
-Different heights.
-
-Tilted 2°.
-
-Different colors.
-
-Some overlap.
-
-Feels alive.
-
----
-
-# Buttons
-
-Not
-
-```
-Blue rectangle
-```
-
-Instead
-
-Chunky.
-
-Rounded.
-
-Bold.
-
-Example
+Chunky, rounded, bold uppercase labels.
 
 ```
 Save me from deadlines →
 ```
 
-Hover
-
-Bounce
-
-Glow
-
-Scale
+Hover: bounce, scale, slight lift (`HoverLift`, spring animations). Respect `prefers-reduced-motion`.
 
 ---
 
-# Copywriting
+## Copywriting
 
-This is where Aviso wins.
+Professional, witty, never cringe. Patterns live in `apps/web/src/lib/copy.ts`.
 
-Examples
+| Instead of | Write |
+|------------|-------|
+| Application deadline approaching. | That deadline you planned to remember? Yeah… it's tomorrow. |
+| Admit Card Released | Good news. No more guessing. Your admit card is live. |
+| Exam Date Updated | NTA changed the dates. Again. We've already updated them. |
+| Result Declared | Deep breath. Results are out. |
 
----
+### Dashboard voice
 
-Instead of
+| Context | Copy |
+|---------|------|
+| Greeting | `Evening, Kelvin ☀️` |
+| Safe day | Nothing exploded today. You're safe. |
+| No new alerts | 🎉 You're all caught up. No academic chaos today. |
+| Footer | Peaceful day. We'll wake you when NTA does. |
 
-```
-Application deadline approaching.
-```
-
-Write
-
-```
-That deadline you planned
-to remember?
-
-Yeah...
-it's tomorrow.
-```
+**Brand promise:** We remember the deadlines. You remember the syllabus.
 
 ---
 
-Instead of
+## Motion
 
-```
-Admit Card Released
-```
+- Scroll reveals on landing sections
+- Hero stagger animations
+- FAQ accordion
+- Floating sticker doodles
+- Dashboard section fade-ins
+- Telegram chat preview animation
 
-```
-Good news.
-
-No more guessing.
-
-Your admit card is live.
-```
+All motion gated by `prefers-reduced-motion` where implemented.
 
 ---
 
-Instead of
+## Pages
 
-```
-Exam Date Updated
-```
+### Landing (`/`)
 
-```
-NTA changed the dates.
+1. Hero
+2. Supported exams
+3. How Aviso works
+4. Features
+5. Telegram preview
+6. Testimonials
+7. FAQ
+8. CTA
 
-Again.
+Components: `apps/web/src/components/landing/`
 
-We've already updated them.
-```
+### Sign-in (`/signin`)
 
----
+Google OAuth — "Almost there." + Continue with Google.
 
-Instead of
+### Dashboard (`/dashboard`)
 
-```
-Result Declared
-```
+- Greeting + Telegram connect card
+- Your exams (subscriptions)
+- **My Notifications** (filterable history)
+- Onboarding flow at `/dashboard/onboarding`
 
-```
-Deep breath.
+### Legal
 
-Results are out.
-```
+- `/privacy`, `/terms`
 
----
+### Design system preview
 
-# Animations
-
-VERY important.
-
-Nothing static.
-
-Everything should move.
-
-Examples
-
-Bell
-
-wiggles.
-
-Telegram icon
-
-flies.
-
-Arrow
-
-draws itself.
-
-Cards
-
-float.
-
-Emoji
-
-bounce.
-
-Underline
-
-gets drawn.
-
-Cursor
-
-magnetic buttons.
+- `/design-system` — live component showcase
 
 ---
 
-# Landing page
+## Product philosophy
 
-Hero
+| Channel | Role |
+|---------|------|
+| **Website** | Control center — auth, subscriptions, notification history |
+| **Telegram** | Delivery channel — instant alerts |
 
-↓
-
-Trusted exams strip
-
-↓
-
-How it works
-
-↓
-
-Why students love Aviso
-
-↓
-
-Telegram preview
-
-↓
-
-Supported exams
-
-↓
-
-Testimonials
-
-↓
-
-FAQ
-
-↓
-
-CTA
+The dashboard **My Notifications** section shows the same records as Telegram delivery, so students still see updates if Telegram is down.
 
 ---
 
-# Dashboard
+## Implementation
 
-Even dashboard shouldn't feel boring.
+| Area | Location |
+|------|----------|
+| Global tokens & utilities | `apps/web/src/app/globals.css` |
+| UI primitives | `apps/web/src/components/ui/` |
+| Layout | `apps/web/src/components/layout/` |
+| Motion | `apps/web/src/components/motion/` |
+| Copy | `apps/web/src/lib/copy.ts` |
+| Theme (dark mode) | `apps/web/src/components/theme/` |
 
-Greeting
-
-```
-Morning, Kelvin ☀️
-
-Nothing exploded today.
-
-You're safe.
-```
-
-instead of
-
-```
-Dashboard
-```
+Run the design system page locally: `npm run dev --workspace=@aviso/web` → `/design-system`.
 
 ---
 
-No notifications
+## Accessibility
 
-```
-Peaceful day.
-
-We'll wake you when NTA does.
-```
+- Skip-to-content link
+- `:focus-visible` lime outlines on interactive elements
+- `#main-content` landmarks on marketing and dashboard
+- Semantic headings and button labels
 
 ---
 
-# Overall personality
+## Identity
 
-If I had to summarize Aviso in one sentence:
-
-> **"A productivity app disguised as a fun brand."**
-
-Not an AI company.
-
-Not a government exam portal.
-
-Not an EdTech coaching platform.
-
-It should feel like something students actually *want* to visit—even when there are no new notifications.
-
-I genuinely think this direction has more long-term brand potential than a typical SaaS dashboard because **the visual identity becomes memorable**, and that matters when your audience is 16–24-year-olds who spend hours every day on Instagram, Discord, Telegram, and YouTube.
+Aviso is a productivity app disguised as a fun student brand — memorable visual identity matters for an audience that lives on Instagram, Discord, Telegram, and YouTube.

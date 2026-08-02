@@ -1,1 +1,132 @@
 # Domain Model
+
+Business entities, enums, and rules for the Aviso exam notification platform.
+
+## Core concepts
+
+### Exam
+
+An entrance exam Aviso monitors (e.g. JEE Main). Has one or more **ExamSource** URLs to crawl.
+
+### ExamSource
+
+A crawlable official URL tied to an exam. The crawler fetches active sources and parses new announcements.
+
+### Event
+
+A detected official update — result declared, admit card released, application deadline, etc. Identified by a unique **fingerprint** to prevent duplicates.
+
+### User
+
+A student account. Created via Google OAuth on first sign-in. May link a Telegram account for delivery.
+
+### Subscription
+
+Links a user to an exam with selected **event types**. One active subscription per user per exam.
+
+### Notification
+
+A queued alert connecting an **Event** to a **Subscription**. Tracks delivery status to Telegram.
+
+## Enums
+
+### ExamStatus
+
+| Value | Meaning |
+|-------|---------|
+| `ACTIVE` | Exam is monitored and available for subscription |
+| `ARCHIVED` | No longer actively monitored |
+
+### EventType
+
+| Value | User-facing label |
+|-------|-------------------|
+| `RESULT` | Results |
+| `ADMIT_CARD_RELEASED` | Admit Cards |
+| `ANSWER_KEY` | Answer Keys |
+| `EXAM_DATE` | Exam Dates |
+| `APPLICATION_OPEN` | Application Open |
+| `APPLICATION_CLOSE` | Application Deadlines |
+| `COUNSELLING_OPEN` | Counselling Open |
+| `COUNSELLING_CLOSE` | Counselling Close |
+
+Web UI labels live in `apps/web/src/lib/event-types.ts`.
+
+### SubscriptionStatus
+
+| Value | Meaning |
+|-------|---------|
+| `ACTIVE` | User receives notifications for this exam |
+| `CANCELLED` | Soft-deleted; no new notifications |
+
+### NotificationStatus
+
+| Value | Meaning |
+|-------|---------|
+| `PENDING` | Queued, not yet sent |
+| `DELIVERED` | Successfully sent via Telegram |
+| `FAILED` | Delivery failed (e.g. no `telegramChatId`, Telegram API error) |
+
+### NotificationChannel
+
+Currently only `TELEGRAM`. Stored on `User.preferredChannel`.
+
+## Business rules
+
+### Event detection
+
+- Each event has a unique `fingerprint` — duplicate detections are ignored.
+- Events are tied to an exam and the source that produced them.
+
+### Notification creation
+
+When a new event is stored:
+
+1. Find all `ACTIVE` subscriptions for that `examId`.
+2. Filter subscriptions whose `eventTypes` array includes the event's `type`.
+3. Create one `Notification` per subscription (`skipDuplicates` on `[eventId, subscriptionId]`).
+
+### Notification delivery
+
+- Worker processes `PENDING` notifications.
+- Requires `user.telegramChatId` on the subscription's user.
+- On success: `DELIVERED` + `deliveredAt`.
+- On failure: `FAILED` + `attemptedAt` + `failureReason`.
+
+### Subscriptions
+
+- A user may subscribe to multiple exams.
+- At most one subscription per `(userId, examId)` pair.
+- Cancelling sets status to `CANCELLED` (not hard delete).
+
+### Telegram linking
+
+- Google-authenticated users connect Telegram via one-time deep link codes.
+- `linkCode` is 6 characters, expires in 10 minutes, cleared after successful link.
+- Linking sets `telegramChatId`, `telegramUserId`, `telegramUsername` on the existing Google user.
+- Does **not** create a separate `telegram+...@aviso.local` user when linking from the web flow.
+
+### Dashboard notification history
+
+- Shows notifications for the logged-in user's active subscriptions.
+- Same records as the Telegram pipeline — not a separate inbox.
+- Filterable by exam slug and event type; paginated.
+
+## User journeys
+
+### New student
+
+1. Land on marketing site → sign in with Google
+2. Onboarding: pick exam + event types → subscription created
+3. Connect Telegram (optional but required for Telegram delivery)
+4. Receive alerts on Telegram; view history on dashboard
+
+### Returning student
+
+1. Sign in → dashboard
+2. Manage subscriptions, connect/disconnect Telegram (disconnect coming soon)
+3. Browse **My Notifications** with filters
+
+### Bot-only user (legacy path)
+
+Users who `/start` the bot without a web account get a Telegram-only user record via `upsertTelegramUser()`. Web linking merges Telegram onto the Google account instead.
