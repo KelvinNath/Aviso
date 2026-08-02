@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ExamStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum EventType {
+  APPLICATION_OPEN
+  APPLICATION_CLOSE
+  ADMIT_CARD_RELEASED
+  EXAM_DATE
+  ANSWER_KEY
+  RESULT
+  COUNSELLING_OPEN
+  COUNSELLING_CLOSE
+}
+
+enum NotificationChannel {
+  TELEGRAM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+}
+
+enum NotificationStatus {
+  PENDING
+  DELIVERED
+  FAILED
+}
+
+model Exam {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  status    ExamStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  examSources   ExamSource[]
+  events        Event[]
+  subscriptions Subscription[]
+}
+
+model ExamSource {
+  id        String   @id @default(cuid())
+  examId    String
+  url       String
+  label     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  exam   Exam    @relation(fields: [examId], references: [id])
+  events Event[]
+
+  @@index([examId])
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  examId        String
+  examSourceId  String
+  type          EventType
+  title         String
+  summary       String
+  sourceUrl     String
+  fingerprint   String    @unique
+  publishedAt   DateTime?
+  detectedAt    DateTime
+  effectiveDate DateTime?
+  createdAt     DateTime  @default(now())
+
+  exam          Exam           @relation(fields: [examId], references: [id])
+  examSource    ExamSource     @relation(fields: [examSourceId], references: [id])
+  notifications Notification[]
+
+  @@index([examId, createdAt])
+}
+
+model User {
+  id               String              @id @default(cuid())
+  displayName      String?
+  email            String              @unique
+  avatarUrl        String?
+  telegramChatId   String?
+  preferredChannel NotificationChannel
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id         String             @id @default(cuid())
+  userId     String
+  examId     String
+  eventTypes EventType[]
+  status     SubscriptionStatus @default(ACTIVE)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id])
+  exam          Exam           @relation(fields: [examId], references: [id])
+  notifications Notification[]
+
+  @@unique([userId, examId])
+  @@index([examId, status])
+}
+
+model Notification {
+  id             String             @id @default(cuid())
+  eventId        String
+  subscriptionId String
+  status         NotificationStatus @default(PENDING)
+  attemptedAt    DateTime?
+  deliveredAt    DateTime?
+  failureReason  String?
+  createdAt      DateTime           @default(now())
+
+  event        Event        @relation(fields: [eventId], references: [id])
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@unique([eventId, subscriptionId])
+  @@index([subscriptionId, createdAt])
+}
