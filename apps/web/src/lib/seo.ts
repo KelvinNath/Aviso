@@ -16,6 +16,10 @@ export const siteConfig = {
 export function createMetadata(overrides?: Partial<Metadata>): Metadata {
   return {
     metadataBase: new URL(siteConfig.url),
+    icons: {
+      icon: "/logo.png",
+      apple: "/logo.png",
+    },
     title: {
       default: siteConfig.name,
       template: `%s · ${siteConfig.name}`,

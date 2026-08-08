@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { AvisoLogo } from "@/components/layout/aviso-logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/layout/container";
@@ -22,11 +23,8 @@ export function SiteNav() {
     <header className="sticky top-0 z-50 border-b-2 border-aviso-dark bg-aviso-light/95 backdrop-blur-sm dark:border-aviso-light dark:bg-aviso-dark/95">
       <Container>
         <nav className="flex h-16 items-center justify-between gap-3">
-          <Link
-            href="/"
-            className="font-heading text-xl font-bold uppercase tracking-tight"
-          >
-            Aviso
+          <Link href="/" className="inline-flex items-center">
+            <AvisoLogo />
           </Link>
 
           <ul className="hidden items-center gap-8 md:flex">

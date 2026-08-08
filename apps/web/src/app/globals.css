@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fafafa;
+  --background: #f5f0e8;
   --foreground: #111111;
 
   /* Brand palette */
@@ -13,7 +13,7 @@
   --aviso-yellow: #ffe600;
   --aviso-coral: #ff6b6b;
   --aviso-sky: #73d9ff;
-  --aviso-light: #fafafa;
+  --aviso-light: #f5f0e8;
   --aviso-dark: #111111;
 
   /* Borders & shadows */

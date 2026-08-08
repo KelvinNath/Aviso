@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AvisoLogo } from "@/components/layout/aviso-logo";
 import { Container } from "@/components/layout/container";
 
 const footerLinks = [
@@ -14,7 +15,7 @@ export function SiteFooter() {
       <Container>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-heading text-lg font-bold uppercase">Aviso</p>
+            <AvisoLogo textClassName="text-lg" imageClassName="h-8" />
             <p className="mt-1 font-body text-sm opacity-70">
               We remember the deadlines. You remember the syllabus.
             </p>
