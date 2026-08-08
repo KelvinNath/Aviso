@@ -58,6 +58,10 @@ const APPLICATION_CLOSE_KEYWORDS = [
   "last date for application",
   "last date for registration",
   "last date of application",
+  "last date for online application",
+  "submission deadline",
+  "application end date",
+  "application deadline",
 ] as const;
 
 const APPLICATION_OPEN_KEYWORDS = [
@@ -80,6 +84,9 @@ const APPLICATION_OPEN_KEYWORDS = [
   "before filling of online application",
   "mismatch of photograph",
   "mismatch of photographs",
+  "brochure",
+  "information brochure",
+  "quick guide",
 ] as const;
 
 const EXAM_DATE_KEYWORDS = [

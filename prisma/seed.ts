@@ -37,41 +37,41 @@ const EXAMS: ExamSeed[] = [
   {
     name: "BITSAT",
     slug: "bitsat",
-    status: ExamStatus.ARCHIVED,
+    status: ExamStatus.ACTIVE,
     source: {
       label: "Official Website",
-      url: "https://www.bitsadmission.com/",
-      isActive: false,
+      url: "https://www.bitsadmission.com/BITSAT_LP/index.html",
+      isActive: true,
     },
   },
   {
     name: "VITEEE",
     slug: "viteee",
-    status: ExamStatus.ARCHIVED,
+    status: ExamStatus.ACTIVE,
     source: {
       label: "Official Website",
       url: "https://viteee.vit.ac.in/",
-      isActive: false,
+      isActive: true,
     },
   },
   {
     name: "COMEDK UGET",
     slug: "comedk-uget",
-    status: ExamStatus.ARCHIVED,
+    status: ExamStatus.ACTIVE,
     source: {
       label: "Official UGET Portal",
-      url: "https://www.comedk.org/UGET",
-      isActive: false,
+      url: "https://www.comedk.org/about-uget-and-notification-2026",
+      isActive: true,
     },
   },
   {
     name: "MHT CET",
     slug: "mht-cet",
-    status: ExamStatus.ARCHIVED,
+    status: ExamStatus.ACTIVE,
     source: {
       label: "Official Website",
       url: "https://cetcell.mahacet.org/",
-      isActive: false,
+      isActive: true,
     },
   },
   {
