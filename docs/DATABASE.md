@@ -177,9 +177,17 @@ The seed upserts 11 engineering exams with official source URLs. Activation poli
 |------|------|--------|---------------|
 | JEE Main | `jee-main` | ACTIVE | yes |
 | JEE Advanced | `jee-advanced` | ACTIVE | yes |
-| All others | see DOMAIN.md | ARCHIVED | no |
+| BITSAT | `bitsat` | ACTIVE | yes |
+| VITEEE | `viteee` | ACTIVE | yes |
+| COMEDK UGET | `comedk-uget` | ACTIVE | yes |
+| MHT CET | `mht-cet` | ACTIVE | yes |
+| WBJEE | `wbjee` | ACTIVE | yes |
+| KCET | `kcet` | ACTIVE | yes |
+| MET | `met` | ACTIVE | yes |
+| SRMJEEE | `srmjeee` | ACTIVE | yes |
+| KIITEE | `kiitee` | ARCHIVED | no (Cloudflare blocks crawler fetch) |
 
-Promote an exam when its parser is implemented and tested:
+Promote KIITEE when live fetch works and parser output is verified:
 
 1. Set `Exam.status` to `ACTIVE`
 2. Set `ExamSource.isActive` to `true`

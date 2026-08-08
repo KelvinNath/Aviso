@@ -86,7 +86,7 @@ Currently only `TELEGRAM`. Stored on `User.preferredChannel`.
 | `ACTIVE` + source `isActive` | Yes | Yes |
 | `ARCHIVED` or source inactive | No | No |
 
-Seed includes 11 engineering exams. **JEE Main**, **JEE Advanced**, **BITSAT**, **VITEEE**, **COMEDK UGET**, and **MHT CET** are ACTIVE today. Others flip to ACTIVE after parser implementation and tests pass.
+Seed includes 11 engineering exams. **JEE Main**, **JEE Advanced**, **BITSAT**, **VITEEE**, **COMEDK UGET**, **MHT CET**, **WBJEE**, **KCET**, **MET**, and **SRMJEEE** are ACTIVE. **KIITEE** stays ARCHIVED until live fetch bypasses Cloudflare (parser + fixture tests are ready).
 
 Seeded slugs: `jee-main`, `jee-advanced`, `bitsat`, `viteee`, `comedk-uget`, `mht-cet`, `wbjee`, `kcet`, `met`, `srmjeee`, `kiitee`.
 

@@ -27,7 +27,7 @@ export const copy = {
     removeSubscription: "Stop tracking",
     onboardingTitle: "Pick your battles",
     onboardingDescription:
-      "Choose an exam and the updates you actually care about. We'll ignore the rest.",
+      "Choose your exams and the updates you actually care about. We'll ignore the rest.",
     onboardingSubmit: "Start tracking",
     notificationsTitle: "My Notifications",
     notificationsDescription:

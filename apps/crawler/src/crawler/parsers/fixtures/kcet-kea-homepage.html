@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KEA – Karnataka Examinations Authority</title>
+
+    <!-- Bootstrap 5.3.3 (CSS only) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        /* ============================================================
+               GLOBAL THEME VARIABLES
+               ============================================================ */
+        :root {
+            --theme-primary: #AF12B0;
+            --theme-primary-dark: #1B608E;
+            --theme-primary-light: rgba(175, 18, 176, 0.10);
+            --theme-background: #f8f9fa;
+            --theme-surface: #ffffff;
+            --theme-text-primary: #333333;
+            --theme-text-secondary: #666666;
+            --theme-border: rgba(175, 18, 176, 0.12);
+            --theme-shadow: rgba(175, 18, 176, 0.10);
+            --theme-gradient: linear-gradient(90deg, #AF12B0 0%, #1B608E 75%);
+
+            /* ---- Section Colors ---- */
+            --section-common: #1B608E;
+            --section-common-light: rgba(27, 96, 142, 0.12);
+            --section-common-bg: #f0f6fb;
+
+            --section-admission: #1B7A4A;
+            --section-admission-light: rgba(27, 122, 74, 0.12);
+            --section-admission-bg: #f0f8f3;
+
+            --section-recruitment: #8B1A4A;
+            --section-recruitment-light: rgba(139, 26, 74, 0.12);
+            --section-recruitment-bg: #f8f0f3;
+
+            /* ---- Quick Links colors ---- */
+            --quicklinks-bg: #f5f0f8;
+            --quicklinks-border: rgba(139, 26, 74, 0.08);
+
+            /* ---- Header heights ---- */
+            --header-height: 82px;
+            --header-height-tablet: 72px;
+            --header-height-mobile: 64px;
+            --navbar-height: 58px;
+            --navbar-height-mobile: 48px;
+        }
+
+        /* ============================================================
+               RESET & BASE
+               ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--theme-background);
+            color: var(--theme-text-primary);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            padding-top: calc(var(--header-height) + var(--navbar-height));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: var(--theme-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: var(--theme-primary-dark);
+            text-decoration: underline;
+        }
+
+        /* ============================================================
+               HEADER – FIXED
+               ============================================================ */
+        .kea-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            background: var(--theme-surface);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+            border-bottom: 2px solid var(--theme-border);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.25rem;
+            transition: height 0.2s ease;
+        }
+
+        .kea-header .container-fluid {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .header-left,
+        .header-right {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 52px;
+        }
+
+        .header-left .logo-wrapper,
+        .header-right .logo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--theme-gradient);
+            color: #fff;
+            font-size: 1.5rem;
+            box-shadow: 0 2px 10px var(--theme-shadow);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .header-left .logo-wrapper:hover,
+        .header-right .logo-wrapper:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(175, 18, 176, 0.25);
+        }
+
+        .logo-img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .header-center {
+            flex: 1 1 auto;
+            text-align: center;
+            padding: 0 0.25rem;
+            min-width: 0;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .header-title-kn {
+            font-weight: 700;
+            color: var(--theme-primary);
+            letter-spacing: 0.02em;
+            font-size: clamp(1rem, 2.4vw, 1.55rem);
+            transition: font-size 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .header-title-en {
+            font-weight: 500;
+            color: var(--theme-primary-dark);
+            letter-spacing: 0.01em;
+            font-size: clamp(0.7rem, 1.6vw, 1.05rem);
+            transition: font-size 0.2s ease;
+            white-space: nowrap;
+        }
+
+        @media (min-width: 992px) {
+            .header-title-kn {
+                font-size: clamp(1.15rem, 2.6vw, 1.65rem);
+            }
+            .header-title-en {
+                font-size: clamp(0.8rem, 1.7vw, 1.1rem);
+            }
+            .header-title-kn .short {
+                display: none;
+            }
+            .header-title-kn .full {
+                display: inline;
+            }
+            .header-title-en .short {
+                display: none;
+            }
+            .header-title-en .full {
+                display: inline;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .header-title-kn {
+                font-size: clamp(0.9rem, 2.8vw, 1.25rem);
+            }
+            .header-title-en {
+                font-size: clamp(0.6rem, 1.8vw, 0.85rem);
+            }
+            .header-title-kn .full {
+                display: none;
+            }
+            .header-title-kn .short {
+                display: inline;
+            }
+            .header-title-en .full {
+                display: none;
+            }
+            .header-title-en .short {
+                display: inline;
+            }
+
+            .kea-header {
+                height: var(--header-height-tablet);
+                padding: 0 0.75rem;
+            }
+            body {
+                padding-top: calc(var(--header-height-tablet) + var(--navbar-height));
+            }
+            .header-left .logo-wrapper,
+            .header-right .logo-wrapper {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+            .logo-img {
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .kea-header {
+                height: var(--header-height-mobile);
+                padding: 0 0.5rem;
+            }
+            body {
+                padding-top: calc(var(--header-height-mobile) + var(--navbar-height-mobile));
+            }
+            .header-left .logo-wrapper,
+            .header-right .logo-wrapper {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+            .logo-img {
+                width: 38px;
+                height: 38px;
+            }
+            .header-title-kn {
+                font-size: clamp(0.7rem, 3.2vw, 0.95rem);
+            }
+            .header-title-en {
+                font-size: clamp(0.5rem, 2vw, 0.7rem);
+            }
+            .header-center {
+                padding: 0 0.15rem;
+            }
+            .header-left,
+            .header-right {
+                min-width: 32px;
+            }
+        }
+
+        /* ============================================================
+               NAVBAR – FIXED, FULL-WIDTH, ALWAYS VISIBLE
+               ============================================================ */
+        .kea-navbar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            right: 0;
+            z-index: 1040;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            height: var(--navbar-height);
+            display: flex;
+            align-items: center;
+            transition: top 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .kea-navbar .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            height: 100%;
+        }
+
+        .kea-navbar .nav-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.4rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--theme-text-secondary);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            min-height: 40px;
+        }
+
+        .kea-navbar .nav-link .nav-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .kea-navbar .nav-link .nav-label {
+            transition: all 0.3s ease;
+        }
+
+        .kea-navbar .nav-link:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--theme-text-primary);
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .kea-navbar .nav-link:hover .nav-icon {
+            transform: scale(1.15) rotate(-4deg);
+        }
+
+        .kea-navbar .nav-link.active-common {
+            background: var(--section-common);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(27, 96, 142, 0.35);
+            transform: translateY(-1px);
+        }
+        .kea-navbar .nav-link.active-common:hover {
+            background: var(--section-common);
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(27, 96, 142, 0.40);
+        }
+        .kea-navbar .nav-link.active-common .nav-icon {
+            color: #fff;
+        }
+
+        .kea-navbar .nav-link.active-admission {
+            background: var(--section-admission);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(27, 122, 74, 0.35);
+            transform: translateY(-1px);
+        }
+        .kea-navbar .nav-link.active-admission:hover {
+            background: var(--section-admission);
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(27, 122, 74, 0.40);
+        }
+        .kea-navbar .nav-link.active-admission .nav-icon {
+            color: #fff;
+        }
+
+        .kea-navbar .nav-link.active-recruitment {
+            background: var(--section-recruitment);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(139, 26, 74, 0.35);
+            transform: translateY(-1px);
+        }
+        .kea-navbar .nav-link.active-recruitment:hover {
+            background: var(--section-recruitment);
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(139, 26, 74, 0.40);
+        }
+        .kea-navbar .nav-link.active-recruitment .nav-icon {
+            color: #fff;
+        }
+
+        .kea-navbar .nav-link:focus-visible {
+            outline: 2px solid var(--theme-primary);
+            outline-offset: 2px;
+        }
+
+        .kea-navbar .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            width: 0;
+            height: 2.5px;
+            border-radius: 4px;
+            background: var(--theme-gradient);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateX(-50%);
+            opacity: 0;
+        }
+
+        .kea-navbar .nav-link:hover::after {
+            width: 40%;
+            opacity: 0.6;
+        }
+
+        .kea-navbar .nav-link.active-common::after,
+        .kea-navbar .nav-link.active-admission::after,
+        .kea-navbar .nav-link.active-recruitment::after {
+            width: 50%;
+            opacity: 0.9;
+            background: #fff;
+        }
+
+        /* ---- Navbar responsive ---- */
+        @media (min-width: 992px) {
+            .kea-navbar .nav-link {
+                padding: 0.5rem 1.8rem;
+                font-size: 0.95rem;
+            }
+            .kea-navbar .nav-link .nav-icon {
+                font-size: 1.15rem;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .kea-navbar {
+                top: var(--header-height-tablet);
+                height: var(--navbar-height);
+                padding: 0 0.75rem;
+            }
+            body {
+                padding-top: calc(var(--header-height-tablet) + var(--navbar-height));
+            }
+            .kea-navbar .nav-link {
+                padding: 0.35rem 1rem;
+                font-size: 0.82rem;
+                min-height: 36px;
+                gap: 0.35rem;
+            }
+            .kea-navbar .nav-link .nav-icon {
+                font-size: 1rem;
+            }
+            .kea-navbar .nav-inner {
+                gap: 0.2rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .kea-navbar {
+                top: var(--header-height-mobile);
+                height: var(--navbar-height-mobile);
+                padding: 0 0.4rem;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            }
+            body {
+                padding-top: calc(var(--header-height-mobile) + var(--navbar-height-mobile));
+            }
+            .kea-navbar .nav-inner {
+                gap: 0.1rem;
+                justify-content: space-around;
+            }
+            .kea-navbar .nav-link {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.65rem;
+                min-height: 32px;
+                gap: 0.2rem;
+                border-radius: 30px;
+                flex: 1 1 auto;
+                max-width: 33.33%;
+                justify-content: center;
+            }
+            .kea-navbar .nav-link .nav-icon {
+                font-size: 0.85rem;
+            }
+            .kea-navbar .nav-link .nav-label {
+                font-size: 0.6rem;
+                letter-spacing: 0.02em;
+            }
+
+            @media (max-width: 400px) {
+                .kea-navbar .nav-link .nav-label {
+                    display: none;
+                }
+                .kea-navbar .nav-link {
+                    padding: 0.2rem 0.3rem;
+                    font-size: 0.6rem;
+                    min-height: 28px;
+                }
+                .kea-navbar .nav-link .nav-icon {
+                    font-size: 1rem;
+                }
+            }
+
+            .kea-navbar .nav-link::after {
+                bottom: 2px;
+                height: 2px;
+            }
+            .kea-navbar .nav-link.active-common,
+            .kea-navbar .nav-link.active-admission,
+            .kea-navbar .nav-link.active-recruitment {
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                transform: translateY(0);
+            }
+            .kea-navbar .nav-link:hover::after {
+                width: 30%;
+            }
+            .kea-navbar .nav-link.active-common::after,
+            .kea-navbar .nav-link.active-admission::after,
+            .kea-navbar .nav-link.active-recruitment::after {
+                width: 40%;
+            }
+        }
+
+        @media (max-width: 359.98px) {
+            .kea-navbar .nav-link .nav-label {
+                display: none !important;
+            }
+            .kea-navbar .nav-link {
+                padding: 0.15rem 0.2rem;
+                min-height: 26px;
+                font-size: 0.55rem;
+            }
+            .kea-navbar .nav-link .nav-icon {
+                font-size: 0.9rem;
+            }
+            .kea-navbar .nav-inner {
+                gap: 0.05rem;
+            }
+        }
+
+        /* ============================================================
+               MAIN CONTENT
+               ============================================================ */
+        .main-content {
+            flex: 1 0 auto;
+            padding: 1.75rem 0 2.5rem;
+        }
+
+        /* ---- Section wrappers ---- */
+        .section-common-wrapper {
+            background: var(--section-common-bg);
+            border-radius: 1.5rem;
+            padding: 1.75rem 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(27, 96, 142, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+        .section-common-wrapper:hover {
+            box-shadow: 0 4px 24px rgba(27, 96, 142, 0.06);
+        }
+
+        .section-admission-wrapper {
+            background: var(--section-admission-bg);
+            border-radius: 1.5rem;
+            padding: 1.75rem 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(27, 122, 74, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+        .section-admission-wrapper:hover {
+            box-shadow: 0 4px 24px rgba(27, 122, 74, 0.06);
+        }
+
+        .section-recruitment-wrapper {
+            background: var(--section-recruitment-bg);
+            border-radius: 1.5rem;
+            padding: 1.75rem 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(139, 26, 74, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+        .section-recruitment-wrapper:hover {
+            box-shadow: 0 4px 24px rgba(139, 26, 74, 0.06);
+        }
+
+        /* ---- Quick Links wrapper ---- */
+        .quick-links-wrapper {
+            background: var(--quicklinks-bg);
+            border-radius: 1.5rem;
+            padding: 1.75rem 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--quicklinks-border);
+            transition: box-shadow 0.3s ease;
+        }
+        .quick-links-wrapper:hover {
+            box-shadow: 0 4px 24px rgba(139, 26, 74, 0.06);
+        }
+
+        @media (max-width: 575.98px) {
+            .section-common-wrapper,
+            .section-admission-wrapper,
+            .section-recruitment-wrapper,
+            .quick-links-wrapper {
+                padding: 1.25rem 0.75rem 1.5rem;
+                border-radius: 1rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* ---- Section Headings ---- */
+        .section-heading {
+            font-weight: 700;
+            font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.1rem;
+        }
+
+        .section-heading-common {
+            color: var(--section-common);
+        }
+        .section-heading-admission {
+            color: var(--section-admission);
+        }
+        .section-heading-recruitment {
+            color: var(--section-recruitment);
+        }
+        .section-heading-quicklinks {
+            color: var(--section-recruitment);
+        }
+
+        .section-divider {
+            height: 3px;
+            border-radius: 4px;
+            margin: 0.2rem 0 1.1rem 0;
+            width: 56px;
+        }
+        .section-divider-common {
+            background: var(--section-common);
+        }
+        .section-divider-admission {
+            background: var(--section-admission);
+        }
+        .section-divider-recruitment {
+            background: var(--section-recruitment);
+        }
+        .section-divider-quicklinks {
+            background: var(--section-recruitment);
+        }
+
+        .section-sub {
+            color: var(--theme-text-secondary);
+            font-size: clamp(0.82rem, 1vw, 0.95rem);
+            margin-bottom: 0.75rem;
+        }
+
+        /* ============================================================
+               COMMON SECTION – LIST STYLE (like the reference image)
+               ============================================================ */
+        .common-list-card {
+            background: var(--theme-surface);
+            border-radius: 1rem;
+            padding: 1.25rem 1.5rem 1.25rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 0 0 1px var(--theme-border);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .common-list-card:hover {
+            box-shadow: 0 8px 32px rgba(27, 96, 142, 0.08), 0 0 0 1px rgba(27, 96, 142, 0.10);
+        }
+
+        .common-list-card .cl-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid rgba(27, 96, 142, 0.08);
+        }
+
+        .common-list-card .cl-header .cl-icon {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .common-list-card .cl-header .cl-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--section-common);
+            letter-spacing: -0.01em;
+        }
+
+        .common-list-card .cl-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem 1.5rem;
+        }
+
+        .common-list-card .cl-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.6rem;
+            border-radius: 10px;
+            transition: background 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .common-list-card .cl-item:hover {
+            background: var(--section-common-light);
+            transform: translateX(4px);
+        }
+
+        .common-list-card .cl-item .cl-li-icon {
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            width: 28px;
+            text-align: center;
+            color: var(--section-common);
+        }
+
+        .common-list-card .cl-item a {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--theme-text-primary);
+            transition: color 0.2s ease;
+            text-decoration: none;
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .common-list-card .cl-item a:hover {
+            color: var(--section-common);
+            text-decoration: underline;
+        }
+
+        .common-list-card .cl-item .cl-arrow {
+            font-size: 0.7rem;
+            color: var(--theme-text-secondary);
+            transition: transform 0.3s ease, color 0.3s ease;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .common-list-card .cl-item:hover .cl-arrow {
+            transform: translateX(4px);
+            color: var(--section-common);
+        }
+
+        /* ---- Common List responsive ---- */
+        @media (max-width: 767.98px) {
+            .common-list-card .cl-grid {
+                grid-template-columns: 1fr;
+                gap: 0.2rem;
+            }
+
+            .common-list-card {
+                padding: 1rem 0.9rem 1rem;
+            }
+
+            .common-list-card .cl-item {
+                padding: 0.4rem 0.4rem;
+                gap: 0.4rem;
+            }
+
+            .common-list-card .cl-item a {
+                font-size: 0.82rem;
+            }
+
+            .common-list-card .cl-item .cl-li-icon {
+                font-size: 0.8rem;
+                width: 24px;
+            }
+
+            .common-list-card .cl-header .cl-title {
+                font-size: 0.95rem;
+            }
+            .common-list-card .cl-header .cl-icon {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .common-list-card .cl-item {
+                flex-wrap: wrap;
+                gap: 0.15rem;
+                padding: 0.3rem 0.3rem;
+            }
+            .common-list-card .cl-item a {
+                font-size: 0.75rem;
+            }
+            .common-list-card .cl-item .cl-li-icon {
+                font-size: 0.7rem;
+                width: 20px;
+            }
+            .common-list-card .cl-item .cl-arrow {
+                font-size: 0.6rem;
+            }
+        }
+
+        /* ============================================================
+               CARDS – For Admission & Recruitment sections
+               ============================================================ */
+        .card-recruit {
+            background: var(--theme-surface);
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 0 0 1px var(--theme-border);
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .card-recruit:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 40px var(--theme-shadow), 0 0 0 1px var(--theme-primary-light);
+        }
+
+        .card-recruit .card-body {
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-recruit .card-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 0.8rem;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+            line-height: 1;
+        }
+
+        /* ---- Admission section card accents ---- */
+        .section-admission-wrapper .card-recruit .card-icon {
+            background: var(--section-admission-light);
+            color: var(--section-admission);
+        }
+        .section-admission-wrapper .card-recruit:hover .card-icon {
+            background: var(--section-admission);
+            color: #fff;
+            transform: scale(1.04) rotate(-2deg);
+        }
+        .section-admission-wrapper .card-recruit .badge-theme {
+            background: var(--section-admission-light);
+            color: var(--section-admission);
+            border-color: rgba(27, 122, 74, 0.12);
+        }
+        .section-admission-wrapper .card-recruit .btn-theme {
+            background: var(--section-admission);
+            box-shadow: 0 2px 12px rgba(27, 122, 74, 0.20);
+        }
+        .section-admission-wrapper .card-recruit .btn-theme:hover {
+            box-shadow: 0 6px 24px rgba(27, 122, 74, 0.30);
+        }
+        .section-admission-wrapper .card-recruit .card-link-list a {
+            color: var(--section-admission);
+        }
+        .section-admission-wrapper .card-recruit .card-link-list a:hover {
+            background: var(--section-admission-light);
+            color: var(--section-admission);
+        }
+
+        /* ---- Recruitment section card accents ---- */
+        .section-recruitment-wrapper .card-recruit .card-icon {
+            background: var(--section-recruitment-light);
+            color: var(--section-recruitment);
+        }
+        .section-recruitment-wrapper .card-recruit:hover .card-icon {
+            background: var(--section-recruitment);
+            color: #fff;
+            transform: scale(1.04) rotate(-2deg);
+        }
+        .section-recruitment-wrapper .card-recruit .badge-theme {
+            background: var(--section-recruitment-light);
+            color: var(--section-recruitment);
+            border-color: rgba(139, 26, 74, 0.12);
+        }
+        .section-recruitment-wrapper .card-recruit .btn-theme {
+            background: var(--section-recruitment);
+            box-shadow: 0 2px 12px rgba(139, 26, 74, 0.20);
+        }
+        .section-recruitment-wrapper .card-recruit .btn-theme:hover {
+            box-shadow: 0 6px 24px rgba(139, 26, 74, 0.30);
+        }
+        .section-recruitment-wrapper .card-recruit .card-link-list a {
+            color: var(--section-recruitment);
+        }
+        .section-recruitment-wrapper .card-recruit .card-link-list a:hover {
+            background: var(--section-recruitment-light);
+            color: var(--section-recruitment);
+        }
+
+        /* ---- Card shared styles ---- */
+        .card-recruit .card-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--theme-text-primary);
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.01em;
+        }
+
+        .card-recruit .card-text {
+            color: var(--theme-text-secondary);
+            font-size: 0.9rem;
+            flex: 1 1 auto;
+            margin-bottom: 0.65rem;
+        }
+
+        .card-recruit .card-link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0.4rem 0;
+        }
+
+        .card-recruit .card-link-list li {
+            margin-bottom: 0.4rem;
+        }
+
+        .card-recruit .card-link-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-recruit .card-link-list a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            transition: background 0.2s ease, color 0.2s ease;
+            font-size: 0.88rem;
+        }
+
+        .card-recruit .card-link-list a .link-emoji {
+            font-size: 0.85rem;
+            transition: transform 0.2s ease;
+        }
+
+        .card-recruit .card-link-list a:hover .link-emoji {
+            transform: translateX(4px);
+        }
+
+        .card-recruit .btn-theme {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+            border: none;
+            padding: 0.45rem 1.3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: transform 0.2s ease, box-shadow 0.25s ease;
+            align-self: flex-start;
+            margin-top: 0.1rem;
+            text-decoration: none;
+        }
+
+        .card-recruit .btn-theme:hover {
+            transform: translateY(-2px);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .card-recruit .btn-theme .btn-emoji {
+            font-size: 0.85rem;
+        }
+
+        .card-recruit .badge-theme {
+            font-weight: 600;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 50px;
+            letter-spacing: 0.03em;
+            display: inline-block;
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+
+        .card-recruit .btn-theme:focus-visible,
+        .card-recruit .card-link-list a:focus-visible {
+            outline: 3px solid var(--theme-primary);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 575.98px) {
+            .card-recruit .card-body {
+                padding: 1.1rem 0.9rem;
+            }
+            .card-recruit .card-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+                border-radius: 12px;
+            }
+            .card-recruit .card-title {
+                font-size: 0.95rem;
+            }
+            .card-recruit .btn-theme {
+                font-size: 0.78rem;
+                padding: 0.35rem 1rem;
+            }
+            .main-content {
+                padding: 1rem 0 1.5rem;
+            }
+        }
+
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .card-recruit .card-body {
+                padding: 1.25rem 1rem;
+            }
+        }
+
+        /* ============================================================
+               QUICK LINKS CARDS
+               ============================================================ */
+        .quick-links-card {
+            background: var(--theme-surface);
+            border-radius: 1rem;
+            padding: 1.5rem 1.5rem 1.25rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 0 0 1px var(--theme-border);
+            height: 100%;
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+        }
+
+        .quick-links-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(139, 26, 74, 0.08), 0 0 0 1px rgba(139, 26, 74, 0.10);
+        }
+
+        .quick-links-card .ql-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid var(--quicklinks-border);
+        }
+
+        .quick-links-card .ql-header .ql-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .quick-links-card .ql-header .ql-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--theme-text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .quick-links-card .ql-header .ql-title.ql-admission {
+            color: var(--section-admission);
+        }
+        .quick-links-card .ql-header .ql-title.ql-recruitment {
+            color: var(--section-recruitment);
+        }
+
+        .quick-links-card .ql-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .quick-links-card .ql-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.45rem 0.6rem;
+            border-radius: 10px;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .quick-links-card .ql-list li:hover {
+            background: var(--theme-primary-light);
+            transform: translateX(4px);
+        }
+
+        .quick-links-card .ql-list li .ql-li-icon {
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            width: 24px;
+            text-align: center;
+        }
+
+        .quick-links-card .ql-list li a {
+            font-weight: 500;
+            font-size: 0.92rem;
+            color: var(--theme-text-primary);
+            transition: color 0.2s ease;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .quick-links-card .ql-list li a:hover {
+            color: var(--theme-primary);
+            text-decoration: underline;
+        }
+
+        .quick-links-card .ql-list li .ql-arrow {
+            font-size: 0.7rem;
+            color: var(--theme-text-secondary);
+            transition: transform 0.3s ease, color 0.3s ease;
+            margin-left: auto;
+        }
+
+        .quick-links-card .ql-list li:hover .ql-arrow {
+            transform: translateX(4px);
+            color: var(--theme-primary);
+        }
+
+        /* ---- Quick Links responsive ---- */
+        @media (max-width: 575.98px) {
+            .quick-links-card {
+                padding: 1.1rem 0.9rem 1rem;
+            }
+            .quick-links-card .ql-header .ql-title {
+                font-size: 1rem;
+            }
+            .quick-links-card .ql-header .ql-icon {
+                font-size: 1.3rem;
+            }
+            .quick-links-card .ql-list li {
+                padding: 0.35rem 0.4rem;
+                gap: 0.4rem;
+            }
+            .quick-links-card .ql-list li a {
+                font-size: 0.82rem;
+            }
+            .quick-links-card .ql-list li .ql-li-icon {
+                font-size: 0.75rem;
+                width: 20px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .quick-links-card .ql-list li {
+                flex-wrap: wrap;
+                gap: 0.2rem;
+                padding: 0.3rem 0.3rem;
+            }
+            .quick-links-card .ql-list li a {
+                font-size: 0.78rem;
+            }
+            .quick-links-card .ql-list li .ql-li-icon {
+                font-size: 0.7rem;
+                width: 18px;
+            }
+        }
+
+        /* ============================================================
+               INFO BAR
+               ============================================================ */
+        .info-bar {
+            background: var(--theme-primary-light);
+            border-radius: 1rem;
+            border: 1px solid var(--theme-border);
+            padding: 1rem 1.5rem;
+        }
+
+        .info-bar .info-emoji {
+            margin-right: 0.5rem;
+        }
+
+        /* ============================================================
+               FOOTER
+               ============================================================ */
+        .kea-footer {
+            background: var(--theme-surface);
+            border-top: 2px solid var(--theme-border);
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 2rem;
+            flex-shrink: 0;
+        }
+
+        .kea-footer .footer-brand {
+            font-weight: 700;
+            color: var(--theme-primary);
+            font-size: 1.2rem;
+        }
+
+        .kea-footer .footer-brand .brand-emoji {
+            margin-right: 0.4rem;
+        }
+
+        .kea-footer .footer-text {
+            color: var(--theme-text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .kea-footer .footer-links a {
+            color: var(--theme-text-secondary);
+            font-size: 0.9rem;
+            margin: 0 0.6rem;
+            transition: color 0.2s ease;
+        }
+
+        .kea-footer .footer-links a:hover {
+            color: var(--theme-primary);
+            text-decoration: none;
+        }
+
+        .kea-footer .footer-divider {
+            border-color: var(--theme-border);
+            opacity: 0.4;
+            margin: 1.25rem 0 0.75rem;
+        }
+
+        .kea-footer .footer-copy {
+            font-size: 0.8rem;
+            color: var(--theme-text-secondary);
+        }
+
+        .kea-footer .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--theme-primary-light);
+            color: var(--theme-primary);
+            font-size: 1rem;
+            margin: 0 0.25rem;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .kea-footer .footer-social a:hover {
+            background: var(--theme-gradient);
+            color: #fff;
+            transform: scale(1.08);
+            text-decoration: none;
+        }
+
+        /* ============================================================
+               UTILITY
+               ============================================================ */
+        .text-theme-primary {
+            color: var(--theme-primary);
+        }
+        .text-theme-dark {
+            color: var(--theme-primary-dark);
+        }
+        .bg-theme-light {
+            background-color: var(--theme-primary-light);
+        }
+        .border-theme {
+            border-color: var(--theme-border);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: calc(var(--header-height) + var(--navbar-height) + 1rem);
+        }
+
+        @media (max-width: 991.98px) {
+            html {
+                scroll-padding-top: calc(var(--header-height-tablet) + var(--navbar-height) + 0.75rem);
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            html {
+                scroll-padding-top: calc(var(--header-height-mobile) + var(--navbar-height-mobile) + 0.5rem);
+            }
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--theme-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    HEADER – FIXED
+    ============================================================ -->
+    <header class="kea-header" role="banner">
+        <div class="container-fluid">
+
+            <!-- LEFT: Government of Karnataka Logo -->
+            <div class="header-left">
+                <div class="logo-wrapper" aria-label="Government of Karnataka Logo">
+                    <img src="assets/logos/Karnataka-Logo.png"
+                    alt="Government of Karnataka Logo"
+                    class="logo-img">
+                </div>
+            </div>
+
+            <!-- CENTER: Title -->
+            <div class="header-center">
+                <div class="header-title-group">
+                    <span class="header-title-kn">
+                        <span class="full">ಕರ್ನಾಟಕ ಪರೀಕ್ಷಾ ಪ್ರಾಧಿಕಾರ</span>
+                        <span class="short">ಕರ್ನಾಟಕ ಪರೀಕ್ಷಾ ಪ್ರಾಧಿಕಾರ</span>
+                    </span>
+                    <span class="header-title-en">
+                        <span class="full">Karnataka Examinations Authority</span>
+                        <span class="short">Karnataka Examinations Authority</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- RIGHT: KEA Logo -->
+            <div class="header-right">
+                <div class="logo-wrapper" aria-label="KEA Logo">
+                    <img src="assets/logos/kealogo.png"
+                    alt="KEA Logo"
+                    class="logo-img">
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ============================================================
+    NAVBAR – FIXED, FULL-WIDTH, ALWAYS VISIBLE
+    ============================================================ -->
+    <nav class="kea-navbar" id="mainNav" role="navigation" aria-label="Main Navigation">
+        <div class="nav-inner">
+
+            <a href="#section-common" class="nav-link active-common" data-section="common">
+                <span class="nav-icon">Common</span>
+                <span class="nav-label"></span>
+            </a>
+
+            <a href="#section-admission" class="nav-link" data-section="admission">
+                <span class="nav-icon">Admissions</span>
+                <span class="nav-label"></span>
+            </a>
+
+            <a href="#section-recruitment" class="nav-link" data-section="recruitment">
+                <span class="nav-icon">Recruitment</span>
+                <span class="nav-label"></span>
+            </a>
+
+            <!-- Quick Links nav item -->
+            <a href="#section-quicklinks" class="nav-link" data-section="quicklinks">
+                <span class="nav-icon">🔗</span>
+                <span class="nav-label">Quick Links</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main class="main-content" role="main">
+        <div class="container">
+
+            <!-- Page Heading -->
+            <div class="text-center mb-4 mb-md-5">
+                <h1 style="color: var(--theme-primary); font-weight: 700; font-size: clamp(1.4rem, 3.2vw, 2.2rem); letter-spacing: -0.02em; margin-bottom: 0.25rem;">
+                    KEA Admission &amp; Recruitment Portal
+                </h1>
+                <p style="color: var(--theme-text-secondary); font-size: clamp(0.85rem, 1.1vw, 1.05rem); margin-bottom: 0.25rem;">
+                    Quick access to all KEA services – Common, Admission &amp; Recruitment
+                </p>
+                <div style="width: 72px; height: 3px; background: var(--theme-gradient); border-radius: 4px; margin: 0.25rem auto 0;"></div>
+            </div>
+
+            <!-- ============================================================
+            SECTION 1: COMMON  (Blue theme) – LIST STYLE like reference image
+            ============================================================ -->
+            <section id="section-common" class="section-common-wrapper">
+                <div class="d-flex align-items-center gap-2 mb-0">
+                    <span style="font-size: 2rem;">🔄</span>
+                    <h2 class="section-heading section-heading-common">Common</h2>
+                </div>
+                <p class="section-sub">General services and resources available for all users.</p>
+                <div class="section-divider section-divider-common"></div>
+
+                <!-- List-style container (like the Admissions image reference) -->
+                <div class="common-list-card">
+                    <div class="cl-header">
+                        <span class="cl-icon">📋</span>
+                        <span class="cl-title">Quick Access</span>
+                    </div>
+                    <div class="cl-grid">
+                        <!-- Item 1: OMR View -->
+                        <div class="cl-item">
+                            <span class="cl-li-icon">📄</span>
+                            <a href="https://kearecruitment.karnataka.gov.in/keaomrs/kries.aspx" target="_blank"><bold>OMR View – Civil Police Constable Recruitment</bold></a>
+                          
+                        </div>
+
+                        <!-- Item 2: Hall Ticket Download -->
+                        <div class="cl-item">
+                            <span class="cl-li-icon">🎫</span>
+                            <a href="https://www.cetonline.karnataka.gov.in/KEA_EXAM_PORTAL/Forms/Candidates/Login" target="_blank"><bold>Hall Ticket Download</bold></a>
+                        
+                        </div>
+
+                        <!-- Item 4: College Portal (NEW) -->
+                        <div class="cl-item">
+                            <span class="cl-li-icon">🏛️</span>
+                            <a href="https://cetonline.karnataka.gov.in/ugcollegeportal2026/Login.aspx" target="_blank"><bold>College Portal 2026</bold></a>
+                        </div>
+
+                         <!-- Item 3: KEA Home Page -->
+                        <div class="cl-item">
+                            <span class="cl-li-icon">🌐</span>
+                            <a href="https://cetonline.karnataka.gov.in/kea/indexnew" target="_blank"><bold>KEA Home Page</bold></a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+            SECTION 2: ADMISSION  (Green theme)
+            ============================================================ -->
+            <section id="section-admission" class="section-admission-wrapper">
+                <div class="d-flex align-items-center gap-2 mb-0">
+                    <span style="font-size: 2rem;">🎓</span>
+                    <h2 class="section-heading section-heading-admission">Admission</h2>
+                </div>
+                <p class="section-sub">Application, option entry, and enrolment links for various entrance exams.</p>
+                <div class="section-divider section-divider-admission"></div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">📝</div>
+                                <span class="badge-theme">ADMISSION</span>
+                                <h5 class="card-title">UGCET / UGNEET 2026 – Admission</h5>
+                                <p class="card-text">Undergraduate Common Entrance Test – application, option entry &amp; new enrolment.</p>
+                                <ul class="card-link-list">
+                                    <li>
+                                        <a href="https://cetonline.karnataka.gov.in/onlineapp2026/forms/login.aspx" target="_blank">
+                                            <span class="link-emoji">📄</span> Application Link (UGCET / UGNEET)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://keaonline.karnataka.gov.in/main/index.php" target="_blank">
+                                            <span class="link-emoji">✏️</span> Option Entry Link (UGCET / UGNEET)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://cetonline.karnataka.gov.in/neetenroll2026/forms/login.aspx" target="_blank">
+                                            <span class="link-emoji">🆕</span> New Enrolment Link (UGCET / UGNEET)
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">📘</div>
+                                <span class="badge-theme">ADMISSION</span>
+                                <h5 class="card-title">DCET 2026 – Admission</h5>
+                                <p class="card-text">Diploma Common Entrance Test – application &amp; option entry.</p>
+                                <ul class="card-link-list">
+                                    <li>
+                                        <a href="https://cetonline.karnataka.gov.in/dcet2026app/login" target="_blank">
+                                            <span class="link-emoji">📄</span> DCET Regular Link
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://cetonline.karnataka.gov.in/dcetwrkng2026app/login" target="_blank">
+                                            <span class="link-emoji">📄</span> DCET Working Professional Link
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://keaonline.karnataka.gov.in/dcet_opt_etry_2026_v1/main/index.php" target="_blank">
+                                            <span class="link-emoji">✏️</span> Option Entry Link
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">📚</div>
+                                <span class="badge-theme">ADMISSION</span>
+                                <h5 class="card-title">PGCET 2026 – Admission</h5>
+                                <p class="card-text">Postgraduate Common Entrance Test – application link.</p>
+                                <ul class="card-link-list">
+                                    <li>
+                                        <a href="https://cetonline.karnataka.gov.in/PGCET_2026" target="_blank">
+                                            <span class="link-emoji">📄</span> Application Link
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+            SECTION 3: RECRUITMENT  (Purple theme)
+            ============================================================ -->
+            <section id="section-recruitment" class="section-recruitment-wrapper">
+                <div class="d-flex align-items-center gap-2 mb-0">
+                    <span style="font-size: 2rem;">💼</span>
+                    <h2 class="section-heading section-heading-recruitment">Recruitment</h2>
+                </div>
+                <p class="section-sub">Direct links to active recruitment portals and notifications.</p>
+                <div class="section-divider section-divider-recruitment"></div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">🏢</div>
+                                <span class="badge-theme">Recruitment</span>
+                                <h5 class="card-title">VAO &amp; Land Survey</h5>
+                                <p class="card-text">Apply for Village Accountant &amp; Land Surveyor recruitments.</p>
+                                <a href="https://cetonline.karnataka.gov.in/kearecruitment2026app/login" target="_blank" class="btn-theme">
+                                    <span class="btn-emoji">🔗</span> Apply Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">🏫</div>
+                                <span class="badge-theme">Recruitment</span>
+                                <h5 class="card-title">KRIES</h5>
+                                <p class="card-text">Karnataka Residential Educational Institutions Society recruitment.</p>
+                                <a href="https://cetonline.karnataka.gov.in/RECT-APP_KRIES/login" target="_blank" class="btn-theme">
+                                    <span class="btn-emoji">🔗</span> Apply Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">🚔</div>
+                                <span class="badge-theme">Recruitment</span>
+                                <h5 class="card-title">KSRP Recruitment</h5>
+                                <p class="card-text">Karnataka State Reserve Police Recruitment.</p>
+                                <a href="https://cetonline.karnataka.gov.in/KSRP_2026/Account/Login" target="_blank" class="btn-theme">
+                                    <span class="btn-emoji">🔗</span> Apply Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card-recruit">
+                            <div class="card-body">
+                                <div class="card-icon">🌿</div>
+                                <span class="badge-theme">Recruitment</span>
+                                <h5 class="card-title">Horticulture Recruitment</h5>
+                                <p class="card-text">Apply for Horticulture Recruitment 2026.</p>
+                                <a href="https://cetonline.karnataka.gov.in/FE_Recr_Ser_ind2026/login" class="btn-theme">
+                                    <span class="btn-emoji">🔗</span> Learn More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+            SECTION 4: QUICK LINKS
+            ============================================================ -->
+            <section id="section-quicklinks" class="quick-links-wrapper">
+                <div class="d-flex align-items-center gap-2 mb-0">
+                    <span style="font-size: 2rem;">🔗</span>
+                    <h2 class="section-heading section-heading-quicklinks">Quick Links</h2>
+                </div>
+                <p class="section-sub">Direct access to admission and recruitment portals – one-click away.</p>
+                <div class="section-divider section-divider-quicklinks"></div>
+
+                <div class="row g-4">
+
+                    <!-- ---- LEFT COLUMN: Admissions Quick Links ---- -->
+                    <div class="col-12 col-md-6">
+                        <div class="quick-links-card">
+                            <div class="ql-header">
+                                <span class="ql-icon">🎓</span>
+                                <span class="ql-title ql-admission">Admissions</span>
+                            </div>
+                            <ul class="ql-list">
+                                <li>
+                                    <span class="ql-li-icon">📄</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/ugcet2026" target="_blank">Undergraduate Common Entrance Test (UGCET - 2026)</a>
+                                    <span class="ql-arrow">→</span>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">📄</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/ugneet2026" target="_blank">Undergraduate National Eligibility Cum Entrance Test (UGNEET - 2026)</a>
+                                    <span class="ql-arrow">→</span>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">📘</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/dcet2026" target="_blank">Diploma Common Entrance Test (DCET - 2026)</a>
+                                    <span class="ql-arrow">→</span>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">📚</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/pgcet2026" target="_blank">Post Graduate Common Entrance Test (PGCET - 2026)</a>
+                                    <span class="ql-arrow">→</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- ---- RIGHT COLUMN: Recruitment Quick Links ---- -->
+                    <div class="col-12 col-md-6">
+                        <div class="quick-links-card">
+                            <div class="ql-header">
+                                <span class="ql-icon">💼</span>
+                                <span class="ql-title ql-recruitment">Recruitment</span>
+                            </div>
+                            <ul class="ql-list">
+                                <li>
+                                    <span class="ql-li-icon">🏢</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/vaorpc2026" target="_blank">Village Administrative Officer Recruitment - 2026 (RPC)</a>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/vaokk2026" target="_blank">Village Administrative Officer Recruitment - 2026 (KK)</a>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">🏢</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/landrpc2026" target="_blank">Land surveyor Recruitment - 2026 (RPC)</a>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/landkk2026" target="_blank">Land surveyor Recruitment - 2026 (KK)</a>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">🏫</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/kreisrpc2026" target="_blank">KREIS Recruitment - 2026 (RPC)</a>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/kreiskk2026" target="_blank">KREIS Recruitment - 2026 (KK)</a>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">🌿</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/hortrpc2026" target="_blank">HORTICULTURE Recruitment - 2026 (RPC)</a>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/hortkk2026" target="_blank">HORTICULTURE Recruitment - 2026 (KK)</a>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">🚔</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/kisrpc2026" target="_blank">KSRP Recruitment - 2026 (RPC)</a>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/kiskk2026" target="_blank">KSRP Recruitment - 2026 (KK)</a>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">🚔</span>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/nurrpc2026" target="_blank">NURSING &amp; PHARMACY RECRUITMENT - 2026 (RPC)</a>
+                                    <a href="https://cetonline.karnataka.gov.in/kea/nurkk2026" target="_blank">NURSING &amp; PHARMACY RECRUITMENT - 2026 (KK)</a>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">📋</span>
+                                    <a href="https://kearecruitment.karnataka.gov.in/keaomrs/kries.aspx" target="_blank">OMR – Civil Police Constable</a>
+                                    <span class="ql-arrow">→</span>
+                                </li>
+                                <li>
+                                    <span class="ql-li-icon">🎫</span>
+                                    <a href="https://www.cetonline.karnataka.gov.in/KEA_EXAM_PORTAL/Forms/Candidates/Login" target="_blank">Hall Ticket Download</a>
+                                    <span class="ql-arrow">→</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div><!-- /row -->
+            </section>
+
+            <!-- ============================================================
+            INFO BAR
+            ============================================================ -->
+            <div class="row mt-3 g-3">
+                <div class="col-12">
+                    <div class="info-bar text-center">
+                        <p class="mb-0" style="color: var(--theme-text-secondary); font-size: 0.92rem;">
+                            <span class="info-emoji">📢</span>
+                            For any queries regarding recruitment or admission, please visit the
+                            <a href="https://cetonline.karnataka.gov.in/kea/indexnew" target="_blank" class="fw-semibold" style="color: var(--theme-primary);">
+                                KEA Home Page
+                            </a>
+                            or contact the helpdesk at
+                            <a href="tel:+918023460460" class="fw-semibold" style="color: var(--theme-primary); text-decoration: none;">
+                                080 - 23460460
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /container -->
+    </main>
+
+    <!-- ============================================================
+    FOOTER
+    ============================================================ -->
+    <footer class="kea-footer" role="contentinfo">
+        <div class="container">
+            <div class="row align-items-center g-4">
+
+                <div class="col-12 col-md-4 text-center text-md-start">
+                    <span class="footer-brand">
+                        <span class="brand-emoji">🎓</span> KEA
+                    </span>
+                    <p class="footer-text">
+                        Karnataka Examinations Authority<br />
+                        <span style="font-size: 0.8rem; color: var(--theme-text-secondary);">
+                            <span class="brand-emoji">📅</span> 2026
+                        </span>
+                    </p>
+                </div>
+
+                <div class="col-12 col-md-4 text-center">
+                    <div class="footer-links">
+                        <a href="https://cetonline.karnataka.gov.in/kea/indexnew" target="_blank">Home</a>
+                        <a href="tel:08023460460">Helpdesk</a>
+                        <a href="tel:08023461576">Fax</a>
+                        <a href="mailto:keauthority-ka@nic.in">Mail</a>
+                    </div>
+                    <div class="footer-links mt-2">
+                        <a href="https://www.youtube.com/@keavikasana5543" target="_blank">YouTube</a>
+                        <a href="https://www.instagram.com/karnatakaexaminationsauthority/" target="_blank">Instagram</a>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 text-center text-md-end">
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook"><span class="brand-emoji"></span></a>
+                        <a href="#" aria-label="Twitter"><span class="brand-emoji"></span></a>
+                        <a href="#" aria-label="YouTube"><span class="brand-emoji"></span></a>
+                        <a href="#" aria-label="Instagram"><span class="brand-emoji"></span></a>
+                    </div>
+                    <p class="footer-copy mt-2 mb-0">
+                        &copy; 2026 KEA &middot; All rights reserved
+                    </p>
+                </div>
+
+            </div>
+
+            <hr class="footer-divider" />
+
+        </div>
+    </footer>
+
+    <!-- ============================================================
+    BOOTSTRAP JS BUNDLE
+    ============================================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- ============================================================
+    CUSTOM JS – ACTIVE LINK ON SCROLL
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            const navLinks = document.querySelectorAll('.kea-navbar .nav-link');
+
+            const sections = [
+                { id: 'section-common', className: 'active-common' },
+                { id: 'section-admission', className: 'active-admission' },
+                { id: 'section-recruitment', className: 'active-recruitment' },
+                { id: 'section-quicklinks', className: 'active-recruitment' }
+            ];
+
+            function getActiveSection(scrollY) {
+                let active = null;
+                let lastTop = -Infinity;
+
+                sections.forEach(function(sec) {
+                    const el = document.getElementById(sec.id);
+                    if (!el) return;
+                    const rect = el.getBoundingClientRect();
+                    const top = rect.top + window.scrollY;
+                    const bottom = top + rect.height;
+
+                    if (scrollY >= top && scrollY < bottom) {
+                        active = sec;
+                        return;
+                    }
+
+                    if (top <= scrollY && top > lastTop) {
+                        lastTop = top;
+                        active = sec;
+                    }
+                });
+
+                if (!active) {
+                    const last = sections[sections.length - 1];
+                    const lastEl = document.getElementById(last.id);
+                    if (lastEl) {
+                        const lastBottom = lastEl.getBoundingClientRect().bottom + window.scrollY;
+                        if (scrollY >= lastBottom) {
+                            active = last;
+                        } else if (scrollY < sections[0].id) {
+                            active = sections[0];
+                        }
+                    }
+                }
+
+                if (!active) {
+                    active = sections[0];
+                }
+
+                return active;
+            }
+
+            function updateActiveLink() {
+                const scrollY = window.scrollY + 80;
+                const active = getActiveSection(scrollY);
+
+                navLinks.forEach(function(link) {
+                    link.className = 'nav-link';
+                    const section = link.getAttribute('data-section');
+                    if (section && active && section === active.id.replace('section-', '')) {
+                        link.classList.add(active.className);
+                    }
+                });
+            }
+
+            let ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        updateActiveLink();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+
+            window.addEventListener('load', function() {
+                setTimeout(updateActiveLink, 100);
+                updateActiveLink();
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    updateActiveLink();
+                }, 200);
+            });
+
+            window.addEventListener('hashchange', function() {
+                setTimeout(updateActiveLink, 300);
+            });
+
+        })();
+    </script>
+
+</body>
+</html>

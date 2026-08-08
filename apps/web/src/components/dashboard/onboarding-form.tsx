@@ -2,9 +2,9 @@
 
 import { EventType } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 
-import { Badge } from "@/components/ui/badge";
+import { ExamPicker } from "@/components/dashboard/exam-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -26,15 +26,44 @@ type OnboardingFormProps = {
   subscribedExamIds: string[];
 };
 
+async function createSubscription(
+  examId: string,
+  eventTypes: EventType[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const response = await fetch("/api/subscriptions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ examId, eventTypes }),
+  });
+
+  if (response.ok) {
+    return { ok: true };
+  }
+
+  if (response.status === 409) {
+    return { ok: true };
+  }
+
+  const data = (await response.json()) as { error?: string };
+
+  return {
+    ok: false,
+    error: data.error ?? "Failed to create subscription",
+  };
+}
+
 export function OnboardingForm({ exams, subscribedExamIds }: OnboardingFormProps) {
   const router = useRouter();
-  const availableExams = exams.filter(
-    (exam) => !subscribedExamIds.includes(exam.id),
+  const availableExams = useMemo(
+    () => exams.filter((exam) => !subscribedExamIds.includes(exam.id)),
+    [exams, subscribedExamIds],
+  );
+  const subscribedExams = useMemo(
+    () => exams.filter((exam) => subscribedExamIds.includes(exam.id)),
+    [exams, subscribedExamIds],
   );
 
-  const [selectedExamId, setSelectedExamId] = useState(
-    availableExams[0]?.id ?? "",
-  );
+  const [selectedExamIds, setSelectedExamIds] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<EventType[]>(
     DEFAULT_EVENT_TYPES,
   );
@@ -53,8 +82,8 @@ export function OnboardingForm({ exams, subscribedExamIds }: OnboardingFormProps
     event.preventDefault();
     setError(null);
 
-    if (!selectedExamId) {
-      setError("Pick an exam first.");
+    if (selectedExamIds.length === 0) {
+      setError("Pick at least one exam.");
       return;
     }
 
@@ -66,18 +95,12 @@ export function OnboardingForm({ exams, subscribedExamIds }: OnboardingFormProps
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/subscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          examId: selectedExamId,
-          eventTypes: selectedEventTypes,
-        }),
-      });
+      for (const examId of selectedExamIds) {
+        const result = await createSubscription(examId, selectedEventTypes);
 
-      if (!response.ok) {
-        const data = (await response.json()) as { error?: string };
-        throw new Error(data.error ?? "Failed to create subscription");
+        if (!result.ok) {
+          throw new Error(result.error);
+        }
       }
 
       router.push("/dashboard");
@@ -116,37 +139,12 @@ export function OnboardingForm({ exams, subscribedExamIds }: OnboardingFormProps
         </p>
       )}
 
-      <div>
-        <Label>Pick an exam</Label>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {availableExams.map((exam) => {
-            const isSelected = selectedExamId === exam.id;
-
-            return (
-              <button
-                key={exam.id}
-                type="button"
-                onClick={() => setSelectedExamId(exam.id)}
-                className={cn(
-                  "rounded-sticker brutal-border p-4 text-left transition-transform hover:-translate-y-0.5",
-                  isSelected
-                    ? "bg-aviso-lime brutal-shadow text-aviso-dark"
-                    : "bg-aviso-light brutal-shadow-sm dark:bg-aviso-dark",
-                )}
-              >
-                <p className="font-heading text-lg font-bold uppercase">
-                  {exam.name}
-                </p>
-                {isSelected && (
-                  <Badge variant="purple" className="mt-2">
-                    Selected
-                  </Badge>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <ExamPicker
+        availableExams={availableExams}
+        subscribedExams={subscribedExams}
+        selectedExamIds={selectedExamIds}
+        onSelectedExamIdsChange={setSelectedExamIds}
+      />
 
       <div>
         <Label>What do you want to hear about?</Label>
