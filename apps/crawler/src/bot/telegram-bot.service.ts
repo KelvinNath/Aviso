@@ -2,7 +2,6 @@ import { EventType } from "@prisma/client";
 
 import { getUpdates, sendMessage } from "../adapters/telegram.adapter.js";
 import {
-  getAlreadySubscribedMessage,
   getHelpMessage,
   getNotRegisteredMessage,
   getWelcomeMessage,
@@ -11,11 +10,21 @@ import {
   linkTelegramAccountWithCode,
 } from "./telegram-link.service.js";
 import {
+  buildExamsListMessage,
+  buildSubscribeUsageMessage,
+  buildUnsubscribeUsageMessage,
+  listActiveExams,
+} from "./telegram-exams.service.js";
+import {
+  buildAlreadySubscribedMessage,
+  buildExamNotActiveMessage,
+  buildExamNotFoundMessage,
   buildSubscribeSuccessMessage,
-  subscribeToJeeMain,
-} from "./telegram-subscribe.service.js";
+  buildUnsubscribeSuccessMessage,
+  subscribeToExam,
+  unsubscribeFromExam,
+} from "./telegram-subscription.service.js";
 import { getSubscriptionStatus } from "./telegram-status.service.js";
-import { unsubscribe } from "./telegram-unsubscribe.service.js";
 import {
   isAdminChat,
   sendTestNotification,
@@ -44,6 +53,17 @@ function getCommand(text: string | undefined): string | null {
   }
 
   return text.trim().split(/\s+/)[0]?.split("@")[0] ?? null;
+}
+
+function parseCommandArgs(text: string): string | null {
+  const trimmed = text.trim();
+  const parts = trimmed.split(/\s+/);
+
+  if (parts.length < 2) {
+    return null;
+  }
+
+  return parts.slice(1).join(" ").trim().toLowerCase() || null;
 }
 
 function parseStartPayload(text: string): string | null {
@@ -94,22 +114,49 @@ async function handleHelpCommand(chatId: number): Promise<void> {
   await sendMessage(String(chatId), getHelpMessage(), "MarkdownV2");
 }
 
-async function handleSubscribeCommand(chatId: number): Promise<void> {
-  const result = await subscribeToJeeMain(String(chatId));
+async function handleExamsCommand(chatId: number): Promise<void> {
+  const exams = await listActiveExams();
+  await sendMessage(String(chatId), buildExamsListMessage(exams));
+}
 
-  if (result === "not_registered") {
-    await sendMessage(String(chatId), getNotRegisteredMessage(), "MarkdownV2");
+async function handleSubscribeCommand(chatId: number, text: string): Promise<void> {
+  const slug = parseCommandArgs(text);
+
+  if (!slug) {
+    const exams = await listActiveExams();
+    await sendMessage(String(chatId), buildSubscribeUsageMessage(exams));
     return;
   }
 
-  if (result === "already_subscribed") {
-    await sendMessage(String(chatId), getAlreadySubscribedMessage());
-    return;
+  const result = await subscribeToExam(String(chatId), slug);
+
+  switch (result.status) {
+    case "not_registered":
+      await sendMessage(String(chatId), getNotRegisteredMessage(), "MarkdownV2");
+      return;
+    case "exam_not_found":
+      await sendMessage(String(chatId), buildExamNotFoundMessage(result.slug));
+      return;
+    case "exam_not_active":
+      await sendMessage(
+        String(chatId),
+        buildExamNotActiveMessage(result.examName, result.slug),
+      );
+      return;
+    case "already_subscribed":
+      await sendMessage(
+        String(chatId),
+        buildAlreadySubscribedMessage(result.examName),
+      );
+      return;
+    case "subscribed":
+      await sendMessage(
+        String(chatId),
+        buildSubscribeSuccessMessage(result.examName, result.eventTypes),
+      );
+      console.log(`[bot] Subscribed chat ${chatId} to ${result.examName}`);
+      return;
   }
-
-  await sendMessage(String(chatId), buildSubscribeSuccessMessage());
-
-  console.log(`[bot] Subscribed chat ${chatId} to JEE Main`);
 }
 
 async function handleStatusCommand(chatId: number): Promise<void> {
@@ -117,11 +164,41 @@ async function handleStatusCommand(chatId: number): Promise<void> {
   await sendMessage(String(chatId), message);
 }
 
-async function handleUnsubscribeCommand(chatId: number): Promise<void> {
-  const message = await unsubscribe(String(chatId));
-  await sendMessage(String(chatId), message);
+async function handleUnsubscribeCommand(
+  chatId: number,
+  text: string,
+): Promise<void> {
+  const slug = parseCommandArgs(text);
 
-  console.log(`[bot] Unsubscribed chat ${chatId} from JEE Main`);
+  if (!slug) {
+    const message = await buildUnsubscribeUsageMessage(String(chatId));
+    await sendMessage(String(chatId), message);
+    return;
+  }
+
+  const result = await unsubscribeFromExam(String(chatId), slug);
+
+  switch (result.status) {
+    case "not_registered":
+      await sendMessage(String(chatId), "Please send /start first.");
+      return;
+    case "exam_not_found":
+      await sendMessage(String(chatId), buildExamNotFoundMessage(result.slug));
+      return;
+    case "not_subscribed":
+      await sendMessage(
+        String(chatId),
+        `You're not subscribed to ${result.examName}.`,
+      );
+      return;
+    case "unsubscribed":
+      await sendMessage(
+        String(chatId),
+        buildUnsubscribeSuccessMessage(result.examName, result.slug),
+      );
+      console.log(`[bot] Unsubscribed chat ${chatId} from ${result.examName}`);
+      return;
+  }
 }
 
 async function handleTestCommand(chatId: number, text: string): Promise<void> {
@@ -181,8 +258,13 @@ async function handleUpdate(update: TelegramUpdate): Promise<void> {
     return;
   }
 
+  if (command === "/exams") {
+    await handleExamsCommand(message.chat.id);
+    return;
+  }
+
   if (command === "/subscribe") {
-    await handleSubscribeCommand(message.chat.id);
+    await handleSubscribeCommand(message.chat.id, text);
     return;
   }
 
@@ -192,7 +274,7 @@ async function handleUpdate(update: TelegramUpdate): Promise<void> {
   }
 
   if (command === "/unsubscribe") {
-    await handleUnsubscribeCommand(message.chat.id);
+    await handleUnsubscribeCommand(message.chat.id, text);
     return;
   }
 

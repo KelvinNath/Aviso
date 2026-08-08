@@ -14,12 +14,16 @@ export type CrawlStatistics = {
   parsedEvents: number;
   newEvents: number;
   notificationsQueued: number;
+  ok: boolean;
+  error?: string;
 };
 
-const emptyStatistics = (): CrawlStatistics => ({
+const emptyStatistics = (error?: string): CrawlStatistics => ({
   parsedEvents: 0,
   newEvents: 0,
   notificationsQueued: 0,
+  ok: false,
+  error,
 });
 
 /**
@@ -62,6 +66,7 @@ export async function crawlExamSource(
       parsedEvents: parsedEvents.length,
       newEvents: newEvents.length,
       notificationsQueued,
+      ok: true,
     };
 
     console.log(`[crawler] Exam: ${source.examName}`);
@@ -76,6 +81,6 @@ export async function crawlExamSource(
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[crawler] Failed to crawl ${source.url}: ${message}`);
 
-    return emptyStatistics();
+    return emptyStatistics(message);
   }
 }

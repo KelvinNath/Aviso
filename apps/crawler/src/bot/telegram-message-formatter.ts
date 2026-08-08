@@ -1,7 +1,5 @@
 import { EventType, type Event } from "@prisma/client";
 
-const EXAM_NAME = "JEE Main";
-
 const MARKDOWN_V2_ESCAPE_PATTERN = /[_*[\]()~`>#+\-=|{}.!\\]/g;
 
 type TypeHeading = {
@@ -57,12 +55,15 @@ function formatLink(sourceUrl: string): string {
 /**
  * Formats an exam event into a Telegram MarkdownV2 notification message.
  */
-export function formatTelegramNotification(event: Event): string {
+export function formatTelegramNotification(
+  event: Event,
+  examName: string,
+): string {
   const typeHeading = getTypeHeading(event.type);
   const summary = event.summary.trim();
 
   const lines = [
-    `🎓 ${bold(`${EXAM_NAME} Update`)}`,
+    `🎓 ${bold(`${examName} Update`)}`,
     "",
     `${typeHeading.emoji} ${bold(typeHeading.label)}`,
     "",
@@ -86,9 +87,9 @@ export function formatTelegramNotification(event: Event): string {
     "",
     "━━━━━━━━━━━━━━",
     "",
-    `${escapeMarkdownV2("You're receiving this because you're subscribed to")} ${bold(EXAM_NAME)}${escapeMarkdownV2(".")}`,
+    `${escapeMarkdownV2("You're receiving this because you're subscribed to")} ${bold(examName)}${escapeMarkdownV2(".")}`,
     "",
-    escapeMarkdownV2("Use /unsubscribe to stop notifications."),
+    escapeMarkdownV2("Use /unsubscribe <exam-slug> to stop notifications."),
   );
 
   return lines.join("\n");

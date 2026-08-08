@@ -79,18 +79,19 @@ flowchart TB
 | Concern | Implementation |
 |---------|----------------|
 | Crawling | `crawler.service.ts` — fetch sources, parse, dedupe by fingerprint |
-| Parsing | `jee.parser.ts`, `jee-event-classifier.ts` |
+| Parsing | `parser.factory.ts` — per-exam parsers; shared utils in `parsers/shared/`; JEE Main in `jee.parser.ts` |
 | Notification queue | `notification.service.ts` — `createNotificationsForEvent()` |
-| Delivery | `notification.worker.ts` — sends Telegram, updates status |
-| Scheduling | `scheduler.ts` — cron for crawl + worker |
-| Bot | `telegram-bot.service.ts` — commands, deep-link linking |
+| Delivery | `notification.worker.ts` — sends Telegram using `exam.name` from event |
+| Scheduling | `scheduler.ts` — cron for crawl + worker; per-exam summary log |
+| Bot | `telegram-bot.service.ts` — `/exams`, `/subscribe <slug>`, `/unsubscribe <slug>` |
+| Tests | Vitest in `@aviso/crawler` — fixture-based parser tests |
 
 ## Notification pipeline
 
 1. Crawler detects a new `Event` (unique `fingerprint`).
 2. `createNotificationsForEvent()` finds active `Subscription` rows where `eventTypes` includes the event type.
 3. One `Notification` row per matching subscription (`PENDING`).
-4. Worker sends Telegram message to `user.telegramChatId`, sets `DELIVERED` or `FAILED`.
+4. Worker sends Telegram message to `user.telegramChatId` using exam-agnostic formatting (`Exam.name` + event type), sets `DELIVERED` or `FAILED`.
 5. Dashboard reads the same `Notification` → `Event` → `Exam` chain for **My Notifications**.
 
 Telegram is the delivery channel. The dashboard is the permanent history.
@@ -129,7 +130,7 @@ Required env: `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_URL`.
 | Layer | Technology |
 |-------|------------|
 | Web | Next.js 15, React 19, Tailwind v4, Framer Motion, Auth.js |
-| Crawler | Node.js, tsx, cheerio, node-cron |
+| Crawler | Node.js, tsx, cheerio, node-cron, Vitest |
 | Database | PostgreSQL 16, Prisma 6 |
 | Monorepo | npm workspaces, Turbo |
 | Bot | Telegram Bot API (long polling) |
@@ -138,6 +139,14 @@ Required env: `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_URL`.
 
 - **Landing exam data** — static in `landing-data.ts` (marketing)
 - **Dashboard exams** — from database via `getActiveExams()`
-- **Event type labels** — `apps/web/src/lib/event-types.ts` (web); crawler has its own formatter headings
+- **Event type labels** — `apps/web/src/lib/event-types.ts` (web); crawler formatter uses generic `EventType` headings
+
+## Multi-exam platform (Step 0)
+
+- **Parser factory** — `getParser(examSlug)` maps slugs to exam-specific parsers.
+- **Shared utilities** — `parsers/shared/` holds title normalization, announcement classification, anchor extraction, and a `shouldIngestAnnouncement()` hook for future cycle filtering.
+- **Exam activation** — seed includes 11 engineering exams; only exams with a tested parser are `ACTIVE` with `ExamSource.isActive = true`.
+- **Telegram bot** — subscribe/unsubscribe by exam slug; `/exams` lists ACTIVE exams from the database.
+- **Tests** — run with `npm run test` from the repo root.
 
 Future: extract shared types/utils into `packages/` when drift becomes a problem.

@@ -120,10 +120,10 @@ npx prisma migrate dev --name describe_change
 
 ## Connection
 
-Default local connection (from `.env.example`):
+Default local connection (from `.env.example`). Host port **5433** avoids conflicting with other Postgres on 5432 (e.g. Onelot):
 
 ```
-postgresql://aviso:aviso_dev_password@localhost:5432/aviso
+postgresql://aviso:aviso_dev_password@localhost:5433/aviso
 ```
 
 Start Postgres:
@@ -162,3 +162,26 @@ Subscription
 ```
 
 Implemented in `apps/crawler/src/services/notification.service.ts`.
+
+## Seed data
+
+Run:
+
+```bash
+npx tsx prisma/seed.ts
+```
+
+The seed upserts 11 engineering exams with official source URLs. Activation policy:
+
+| Exam | Slug | Status | Source active |
+|------|------|--------|---------------|
+| JEE Main | `jee-main` | ACTIVE | yes |
+| JEE Advanced | `jee-advanced` | ACTIVE | yes |
+| All others | see DOMAIN.md | ARCHIVED | no |
+
+Promote an exam when its parser is implemented and tested:
+
+1. Set `Exam.status` to `ACTIVE`
+2. Set `ExamSource.isActive` to `true`
+
+No new migration required for multi-exam seeding.

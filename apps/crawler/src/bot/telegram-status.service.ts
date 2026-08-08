@@ -68,7 +68,7 @@ export async function getSubscriptionStatus(chatId: string): Promise<string> {
   if (subscriptions.length === 0) {
     return `You don't have any active subscriptions.
 
-Use /subscribe to subscribe to JEE Main.`;
+Use /exams to see available exams, then /subscribe <slug> to get started.`;
   }
 
   const subscriptionBlocks = subscriptions.map((subscription) =>

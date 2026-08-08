@@ -16,7 +16,7 @@ export function getWelcomeMessage(): string {
     "👋 " + bold("Welcome to Aviso"),
     "",
     escapeMarkdownV2(
-      "Aviso automatically monitors the official JEE Main website and instantly notifies you whenever important announcements are published.",
+      "Aviso automatically monitors official exam websites and instantly notifies you whenever important announcements are published.",
     ),
     "",
     escapeMarkdownV2("You'll receive alerts for:"),
@@ -30,17 +30,19 @@ export function getWelcomeMessage(): string {
     "",
     bold("Getting Started"),
     "",
-    escapeMarkdownV2("1. Use /subscribe to subscribe."),
-    escapeMarkdownV2("2. Use /status to check your subscription."),
-    escapeMarkdownV2("3. Use /unsubscribe anytime."),
+    escapeMarkdownV2("1. Use /exams to see available exams."),
+    escapeMarkdownV2("2. Use /subscribe <slug> to subscribe."),
+    escapeMarkdownV2("3. Use /status to check your subscriptions."),
+    escapeMarkdownV2("4. Use /unsubscribe <slug> anytime."),
     "",
     bold("Available Commands"),
     "",
     commandLine("/start", "Register and see this welcome message"),
     commandLine("/help", "Show help and command reference"),
-    commandLine("/subscribe", "Subscribe to JEE Main notifications"),
+    commandLine("/exams", "List exams available for subscription"),
+    commandLine("/subscribe", "Subscribe to an exam — /subscribe <slug>"),
     commandLine("/status", "View your active subscriptions"),
-    commandLine("/unsubscribe", "Stop JEE Main notifications"),
+    commandLine("/unsubscribe", "Stop notifications — /unsubscribe <slug>"),
     "",
     // Future commands: /latest, /settings, /feedback — extend Available Commands here.
   ].join("\n");
@@ -64,9 +66,10 @@ export function getHelpMessage(): string {
       "/help",
       "Show this help page with all available commands",
     ),
+    commandLine("/exams", "List all exams currently available for subscription"),
     commandLine(
       "/subscribe",
-      "Subscribe to JEE Main notifications for results, admit cards, answer keys, and exam dates",
+      "Subscribe to an exam — usage: /subscribe <exam-slug>",
     ),
     commandLine(
       "/status",
@@ -74,13 +77,13 @@ export function getHelpMessage(): string {
     ),
     commandLine(
       "/unsubscribe",
-      "Cancel your JEE Main subscription while keeping your account",
+      "Cancel a subscription — usage: /unsubscribe <exam-slug>",
     ),
     "",
     bold("Tips"),
     "",
     escapeMarkdownV2(
-      "Send /subscribe once to start receiving alerts. You can check /status anytime or /unsubscribe when you no longer want notifications.",
+      "Use /exams to find exam slugs, then /subscribe <slug> to start receiving alerts. Check /status anytime or /unsubscribe <slug> when you no longer want notifications.",
     ),
     "",
     // Future commands:
@@ -95,8 +98,4 @@ export function getHelpMessage(): string {
  */
 export function getNotRegisteredMessage(): string {
   return escapeMarkdownV2("Please send /start first to register with Aviso.");
-}
-
-export function getAlreadySubscribedMessage(): string {
-  return "You're already subscribed to JEE Main notifications.";
 }

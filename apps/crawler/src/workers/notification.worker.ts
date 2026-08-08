@@ -14,7 +14,11 @@ export async function processPendingNotifications(): Promise<void> {
       status: NotificationStatus.PENDING,
     },
     include: {
-      event: true,
+      event: {
+        include: {
+          exam: true,
+        },
+      },
       subscription: {
         include: {
           user: true,
@@ -32,7 +36,7 @@ export async function processPendingNotifications(): Promise<void> {
         throw new Error("User has no telegramChatId");
       }
 
-      const message = formatTelegramNotification(event);
+      const message = formatTelegramNotification(event, event.exam.name);
 
       await sendMessage(user.telegramChatId, message, "MarkdownV2");
 
