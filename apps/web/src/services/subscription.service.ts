@@ -90,3 +90,67 @@ export async function cancelSubscription(
     data: { status: SubscriptionStatus.CANCELLED },
   });
 }
+
+const subscriptionDetailSelect = {
+  id: true,
+  eventTypes: true,
+  exam: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      cycles: {
+        where: { cycleYear: CURRENT_CYCLE_YEAR },
+        select: {
+          phase: true,
+          cycleYear: true,
+        },
+        take: 1,
+      },
+    },
+  },
+} as const;
+
+/**
+ * Returns an active subscription owned by the user, or null.
+ */
+export async function findSubscriptionByIdForUser(
+  subscriptionId: string,
+  userId: string,
+) {
+  return prisma.subscription.findFirst({
+    where: {
+      id: subscriptionId,
+      userId,
+      status: SubscriptionStatus.ACTIVE,
+    },
+    select: subscriptionDetailSelect,
+  });
+}
+
+/**
+ * Updates event type preferences for an active subscription.
+ */
+export async function updateSubscriptionEventTypes(
+  subscriptionId: string,
+  userId: string,
+  eventTypes: EventType[],
+) {
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      id: subscriptionId,
+      userId,
+      status: SubscriptionStatus.ACTIVE,
+    },
+  });
+
+  if (!subscription) {
+    return null;
+  }
+
+  return prisma.subscription.update({
+    where: { id: subscriptionId },
+    data: { eventTypes },
+    select: subscriptionDetailSelect,
+  });
+}

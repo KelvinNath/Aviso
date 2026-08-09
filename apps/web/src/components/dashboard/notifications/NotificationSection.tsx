@@ -23,6 +23,7 @@ type SubscribedExam = {
 
 type NotificationSectionProps = {
   subscribedExams: SubscribedExam[];
+  showPageHeader?: boolean;
 };
 
 const PAGE_SIZE = 10;
@@ -51,6 +52,7 @@ function buildNotificationsUrl(
 
 export function NotificationSection({
   subscribedExams,
+  showPageHeader = true,
 }: NotificationSectionProps) {
   const [notifications, setNotifications] = useState<DashboardNotification[]>(
     [],
@@ -133,14 +135,16 @@ export function NotificationSection({
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-col gap-3 border-b-2 border-aviso-dark/10 pb-4 dark:border-aviso-light/10">
-        <h2 className="font-heading text-xl font-bold uppercase">
-          {copy.dashboard.notificationsTitle}
-        </h2>
-        <p className="font-body text-sm opacity-70">
-          {copy.dashboard.notificationsDescription}
-        </p>
-      </div>
+      {showPageHeader && (
+        <div className="flex flex-col gap-3 border-b-2 border-aviso-dark/10 pb-4 dark:border-aviso-light/10">
+          <h2 className="font-heading text-xl font-bold uppercase">
+            {copy.dashboard.notificationsTitle}
+          </h2>
+          <p className="font-body text-sm opacity-70">
+            {copy.dashboard.notificationsDescription}
+          </p>
+        </div>
+      )}
 
       <div className="space-y-3">
         {subscribedExams.length > 1 && (

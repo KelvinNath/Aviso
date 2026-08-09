@@ -11,8 +11,7 @@ import {
   findSubscriptionsByUserId,
 } from "@/services/subscription.service";
 
-/** Valid event type values from the Prisma schema enum. */
-const VALID_EVENT_TYPES = new Set<string>(Object.values(EventType));
+import { parseEventTypesInput } from "@/lib/event-types";
 
 type SubscriptionRequestBody = {
   examId: string;
@@ -112,14 +111,7 @@ function validateSubscriptionBody(body: unknown): string | null {
     return "Missing required field: examId";
   }
 
-  if (!Array.isArray(eventTypes) || eventTypes.length === 0) {
-    return "Missing required field: eventTypes";
-  }
-
-  const allValid = eventTypes.every(
-    (type) => typeof type === "string" && VALID_EVENT_TYPES.has(type),
-  );
-  if (!allValid) {
+  if (!parseEventTypesInput(eventTypes)) {
     return "Invalid eventTypes: must be a non-empty array of valid event types";
   }
 

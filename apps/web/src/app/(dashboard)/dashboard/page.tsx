@@ -6,7 +6,6 @@ import {
   AnimatedSection,
 } from "@/components/motion/dashboard-motion";
 import { TelegramConnectCard } from "@/components/dashboard/telegram-connect-card";
-import { NotificationSection } from "@/components/dashboard/notifications/NotificationSection";
 import { SubscriptionList } from "@/components/dashboard/subscription-list";
 import { ButtonLink } from "@/components/ui/button";
 import { copy } from "@/lib/copy";
@@ -27,7 +26,7 @@ export default async function DashboardPage() {
   const subscriptions = await findSubscriptionsByUserId(user.id);
 
   if (subscriptions.length === 0) {
-    redirect("/dashboard/onboarding");
+    redirect("/dashboard/track");
   }
 
   const firstName = getGreetingName(user.displayName, user.email);
@@ -44,13 +43,37 @@ export default async function DashboardPage() {
         />
       </AnimatedSection>
 
+      <AnimatedSection delay={0.15}>
+        <div className="flex flex-col gap-3 rounded-chunky brutal-border bg-aviso-sky/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-body text-sm">
+            Tracking {subscriptions.length}{" "}
+            {subscriptions.length === 1 ? "exam" : "exams"}. Read updates on the
+            notifications page.
+          </p>
+          <ButtonLink
+            href="/dashboard/notifications"
+            variant="secondary"
+            size="sm"
+            arrow
+            className="self-start sm:self-center"
+          >
+            {copy.dashboard.viewNotifications}
+          </ButtonLink>
+        </div>
+      </AnimatedSection>
+
       <AnimatedSection delay={0.2} className="space-y-4">
         <div className="flex flex-col gap-3 border-b-2 border-aviso-dark/10 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-aviso-light/10">
-          <h2 className="font-heading text-xl font-bold uppercase">
-            {copy.dashboard.subscriptionsTitle}
-          </h2>
+          <div>
+            <h2 className="font-heading text-xl font-bold uppercase">
+              {copy.dashboard.subscriptionsTitle}
+            </h2>
+            <p className="mt-1 font-body text-sm opacity-70">
+              {copy.dashboard.subscriptionsDescription}
+            </p>
+          </div>
           <ButtonLink
-            href="/dashboard/onboarding"
+            href="/dashboard/track"
             variant="secondary"
             size="sm"
             arrow
@@ -63,13 +86,7 @@ export default async function DashboardPage() {
         <SubscriptionList subscriptions={subscriptions} />
       </AnimatedSection>
 
-      <AnimatedSection delay={0.25} className="space-y-4">
-        <NotificationSection
-          subscribedExams={subscriptions.map((subscription) => subscription.exam)}
-        />
-      </AnimatedSection>
-
-      <AnimatedSection delay={0.3}>
+      <AnimatedSection delay={0.25}>
         <p className="font-body text-sm opacity-60">
           {copy.dashboard.peaceful}{" "}
           <Link href="/" className="underline-offset-4 hover:underline">

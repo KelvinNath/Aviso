@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AvisoLogo } from "@/components/layout/aviso-logo";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Container } from "@/components/layout/container";
 
@@ -21,10 +22,13 @@ export function DashboardHeader({
   return (
     <header className="border-b-2 border-aviso-dark bg-aviso-light dark:border-aviso-light dark:bg-aviso-dark">
       <Container>
-        <div className="flex h-16 items-center justify-between gap-4">
-          <Link href="/dashboard" className="inline-flex items-center">
-            <AvisoLogo />
-          </Link>
+        <div className="flex h-16 items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+            <Link href="/dashboard" className="inline-flex shrink-0 items-center">
+              <AvisoLogo />
+            </Link>
+            <DashboardNav />
+          </div>
 
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <ThemeToggle />

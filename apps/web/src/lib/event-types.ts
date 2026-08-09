@@ -21,6 +21,24 @@ const eventTypeLabelMap = new Map(
   EVENT_TYPE_OPTIONS.map((option) => [option.value, option.label]),
 );
 
+const VALID_EVENT_TYPES = new Set<string>(Object.values(EventType));
+
+export function parseEventTypesInput(value: unknown): EventType[] | null {
+  if (!Array.isArray(value) || value.length === 0) {
+    return null;
+  }
+
+  const allValid = value.every(
+    (type) => typeof type === "string" && VALID_EVENT_TYPES.has(type),
+  );
+
+  if (!allValid) {
+    return null;
+  }
+
+  return value as EventType[];
+}
+
 export function formatEventTypes(eventTypes: EventType[]): string {
   return eventTypes
     .map((type) => eventTypeLabelMap.get(type) ?? type)

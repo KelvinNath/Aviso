@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { EditPreferencesModal } from "@/components/dashboard/edit-preferences-modal";
 import { HoverLift } from "@/components/motion/hover-lift";
 import { copy } from "@/lib/copy";
 import { formatEventTypes } from "@/lib/event-types";
@@ -34,6 +35,8 @@ type SubscriptionListProps = {
 export function SubscriptionList({ subscriptions }: SubscriptionListProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
+  const [editingSubscription, setEditingSubscription] =
+    useState<SubscriptionItem | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,6 +77,19 @@ export function SubscriptionList({ subscriptions }: SubscriptionListProps) {
 
   return (
     <div className="space-y-4">
+      <EditPreferencesModal
+        subscription={
+          editingSubscription
+            ? {
+                id: editingSubscription.id,
+                examName: editingSubscription.exam.name,
+                eventTypes: editingSubscription.eventTypes,
+              }
+            : null
+        }
+        onClose={() => setEditingSubscription(null)}
+      />
+
       {error && (
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: -8 }}
@@ -115,17 +131,28 @@ export function SubscriptionList({ subscriptions }: SubscriptionListProps) {
                   </CardDescription>
                 </div>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={removingId === subscription.id}
-                  onClick={() => handleRemove(subscription.id)}
-                  className="shrink-0 self-start sm:self-center"
-                >
-                  {removingId === subscription.id
-                    ? "Removing..."
-                    : copy.dashboard.removeSubscription}
-                </Button>
+                <div className="flex shrink-0 flex-col gap-2 self-start sm:self-center">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    onClick={() => setEditingSubscription(subscription)}
+                  >
+                    {copy.dashboard.editPreferences}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={removingId === subscription.id}
+                    onClick={() => handleRemove(subscription.id)}
+                    className="w-full sm:w-auto"
+                  >
+                    {removingId === subscription.id
+                      ? "Removing..."
+                      : copy.dashboard.removeSubscription}
+                  </Button>
+                </div>
               </div>
             </Card>
           </HoverLift>
