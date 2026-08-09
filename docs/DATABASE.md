@@ -7,6 +7,7 @@ PostgreSQL database managed by Prisma. Schema: [`prisma/schema.prisma`](../prism
 | Model | Purpose |
 |-------|---------|
 | `Exam` | Exam being monitored |
+| `ExamCycle` | Admissions cycle phase and milestone dates per exam/year |
 | `ExamSource` | Crawlable URL for an exam |
 | `Event` | Detected official announcement |
 | `User` | Student account (Google + optional Telegram) |
@@ -23,6 +24,24 @@ PostgreSQL database managed by Prisma. Schema: [`prisma/schema.prisma`](../prism
 | `name` | `String` | Display name (e.g. "JEE Main") |
 | `slug` | `String` | Unique URL key |
 | `status` | `ExamStatus` | `ACTIVE` or `ARCHIVED` |
+
+### ExamCycle
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | `String` | cuid |
+| `examId` | `String` | FK → Exam |
+| `cycleYear` | `Int` | Admissions year (e.g. 2026) |
+| `phase` | `ExamCyclePhase` | Current cycle phase |
+| `registrationClose` | `DateTime?` | Last registration day |
+| `examDate` | `DateTime?` | Primary exam day |
+| `counsellingClose` | `DateTime?` | Last counselling day |
+| `completedAt` | `DateTime?` | Set when phase becomes `COMPLETE` |
+
+**Unique:** `(examId, cycleYear)`  
+**Index:** `(examId, phase)`
+
+Phases: `REGISTRATION` → `PRE_EXAM` → `POST_EXAM` → `COMPLETE`. When `phase` is `COMPLETE`, the exam stays `ACTIVE` but new subscriptions and notifications are blocked for that cycle year.
 
 ### ExamSource
 
@@ -50,11 +69,13 @@ PostgreSQL database managed by Prisma. Schema: [`prisma/schema.prisma`](../prism
 | `fingerprint` | `String` | Unique dedupe key |
 | `publishedAt` | `DateTime?` | Official publish date if known |
 | `detectedAt` | `DateTime` | When crawler found it |
-| `effectiveDate` | `DateTime?` | Relevant date (deadline, exam date) |
+| `effectiveDate` | `DateTime?` | Last day the event stays actionable (deadline, exam day, window end) |
 | `notifyPolicy` | `NotifyPolicy` | `ALERT` (notify/display) or `REFERENCE` (ingest only) |
 
 **Unique:** `fingerprint`  
 **Index:** `(examId, createdAt)`
+
+`effectiveDate` is the last calendar day an event stays actionable for notify/display. Parsers set it from deadlines, exam days, or registration windows; the crawler and dashboard hide events once `effectiveDate` is in the past. `RESULT` and `ANSWER_KEY` events usually omit it and rely on `publishedAt` freshness instead.
 
 ### User
 

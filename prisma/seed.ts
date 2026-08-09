@@ -1,6 +1,9 @@
-import { ExamStatus, PrismaClient } from "@prisma/client";
+import { ExamCyclePhase, ExamStatus, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+/** Matches EXAM_CYCLE_YEAR in apps/crawler cycle-filter. */
+const CURRENT_CYCLE_YEAR = 2026;
 
 type ExamSeed = {
   name: string;
@@ -11,7 +14,18 @@ type ExamSeed = {
     url: string;
     isActive: boolean;
   };
+  cycle?: {
+    registrationClose?: Date;
+    examDate?: Date;
+    counsellingClose?: Date;
+    phase?: ExamCyclePhase;
+    completedAt?: Date;
+  };
 };
+
+function endOfDay(year: number, monthIndex: number, day: number): Date {
+  return new Date(year, monthIndex, day, 23, 59, 59, 999);
+}
 
 const EXAMS: ExamSeed[] = [
   {
@@ -23,6 +37,11 @@ const EXAMS: ExamSeed[] = [
       url: "https://jeemain.nta.nic.in/",
       isActive: true,
     },
+    cycle: {
+      registrationClose: endOfDay(2026, 0, 31),
+      examDate: endOfDay(2026, 3, 8),
+      counsellingClose: endOfDay(2026, 6, 31),
+    },
   },
   {
     name: "JEE Advanced",
@@ -32,6 +51,11 @@ const EXAMS: ExamSeed[] = [
       label: "Official Website",
       url: "https://jeeadv.ac.in/",
       isActive: true,
+    },
+    cycle: {
+      registrationClose: endOfDay(2026, 4, 10),
+      examDate: endOfDay(2026, 4, 17),
+      counsellingClose: endOfDay(2026, 6, 31),
     },
   },
   {
@@ -62,6 +86,10 @@ const EXAMS: ExamSeed[] = [
       label: "Official UGET Portal",
       url: "https://www.comedk.org/about-uget-and-notification-2026",
       isActive: true,
+    },
+    cycle: {
+      examDate: endOfDay(2026, 4, 9),
+      counsellingClose: endOfDay(2026, 6, 30),
     },
   },
   {
@@ -113,6 +141,10 @@ const EXAMS: ExamSeed[] = [
       url: "https://applications.srmist.edu.in/btech",
       isActive: true,
     },
+    cycle: {
+      registrationClose: endOfDay(2026, 3, 16),
+      examDate: endOfDay(2026, 3, 24),
+    },
   },
   {
     name: "KIITEE",
@@ -123,8 +155,59 @@ const EXAMS: ExamSeed[] = [
       url: "https://kiitee.kiit.ac.in/",
       isActive: false,
     },
+    cycle: {
+      phase: ExamCyclePhase.COMPLETE,
+      completedAt: endOfDay(2026, 0, 1),
+    },
   },
 ];
+
+async function upsertExamCycle(
+  examId: string,
+  cycleSeed: NonNullable<ExamSeed["cycle"]>,
+): Promise<void> {
+  const milestones = {
+    registrationClose: cycleSeed.registrationClose ?? null,
+    examDate: cycleSeed.examDate ?? null,
+    counsellingClose: cycleSeed.counsellingClose ?? null,
+  };
+
+  const phase =
+    cycleSeed.phase ??
+    (milestones.counsellingClose &&
+    milestones.counsellingClose.getTime() < Date.now()
+      ? ExamCyclePhase.COMPLETE
+      : ExamCyclePhase.REGISTRATION);
+
+  await prisma.examCycle.upsert({
+    where: {
+      examId_cycleYear: {
+        examId,
+        cycleYear: CURRENT_CYCLE_YEAR,
+      },
+    },
+    create: {
+      examId,
+      cycleYear: CURRENT_CYCLE_YEAR,
+      phase,
+      ...milestones,
+      completedAt:
+        phase === ExamCyclePhase.COMPLETE
+          ? (cycleSeed.completedAt ?? new Date())
+          : null,
+    },
+    update: {
+      phase,
+      registrationClose: milestones.registrationClose,
+      examDate: milestones.examDate,
+      counsellingClose: milestones.counsellingClose,
+      completedAt:
+        phase === ExamCyclePhase.COMPLETE
+          ? (cycleSeed.completedAt ?? new Date())
+          : null,
+    },
+  });
+}
 
 async function upsertExamWithSource(examSeed: ExamSeed): Promise<void> {
   const exam = await prisma.exam.upsert({
@@ -164,6 +247,10 @@ async function upsertExamWithSource(examSeed: ExamSeed): Promise<void> {
         isActive: examSeed.source.isActive,
       },
     });
+  }
+
+  if (examSeed.status === ExamStatus.ACTIVE || examSeed.cycle) {
+    await upsertExamCycle(exam.id, examSeed.cycle ?? {});
   }
 
   console.log(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ type ExamPickerProps = {
   availableExams: ExamOption[];
   subscribedExams: ExamOption[];
   selectedExamIds: string[];
-  onSelectedExamIdsChange: (examIds: string[]) => void;
+  onSelectedExamIdsChange: Dispatch<SetStateAction<string[]>>;
 };
 
 export function ExamPicker({
@@ -36,15 +36,17 @@ export function ExamPicker({
   );
 
   function toggleExam(examId: string) {
-    onSelectedExamIdsChange(
-      selectedExamIds.includes(examId)
-        ? selectedExamIds.filter((id) => id !== examId)
-        : [...selectedExamIds, examId],
+    onSelectedExamIdsChange((current) =>
+      current.includes(examId)
+        ? current.filter((id) => id !== examId)
+        : [...current, examId],
     );
   }
 
   function removeExam(examId: string) {
-    onSelectedExamIdsChange(selectedExamIds.filter((id) => id !== examId));
+    onSelectedExamIdsChange((current) =>
+      current.filter((id) => id !== examId),
+    );
   }
 
   function selectAll() {

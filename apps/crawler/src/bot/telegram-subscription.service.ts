@@ -1,10 +1,12 @@
 import {
   EventType,
+  ExamCyclePhase,
   ExamStatus,
   SubscriptionStatus,
   type Exam,
 } from "@prisma/client";
 
+import { EXAM_CYCLE_YEAR } from "../services/exam-cycle.service.js";
 import { prisma } from "../lib/prisma.js";
 
 export const DEFAULT_BOT_EVENT_TYPES = [
@@ -30,7 +32,8 @@ export type SubscribeResult =
   | { status: "already_subscribed"; examName: string }
   | { status: "subscribed"; examName: string; eventTypes: EventType[] }
   | { status: "exam_not_found"; slug: string }
-  | { status: "exam_not_active"; examName: string; slug: string };
+  | { status: "exam_not_active"; examName: string; slug: string }
+  | { status: "cycle_ended"; examName: string; slug: string; cycleYear: number };
 
 export type UnsubscribeResult =
   | { status: "not_registered" }
@@ -59,6 +62,14 @@ export function buildAlreadySubscribedMessage(examName: string): string {
 
 export function buildExamNotActiveMessage(examName: string, slug: string): string {
   return `${examName} (${slug}) is not available for subscriptions yet. Use /exams to see active exams.`;
+}
+
+export function buildCycleEndedMessage(
+  examName: string,
+  slug: string,
+  cycleYear: number,
+): string {
+  return `${examName} (${slug}) ${cycleYear} cycle has ended. New subscriptions will open when the next cycle begins.`;
 }
 
 export function buildExamNotFoundMessage(slug: string): string {
@@ -103,6 +114,24 @@ export async function subscribeToExam(
 
   if (exam.status !== ExamStatus.ACTIVE) {
     return { status: "exam_not_active", examName: exam.name, slug: exam.slug };
+  }
+
+  const cycle = await prisma.examCycle.findUnique({
+    where: {
+      examId_cycleYear: {
+        examId: exam.id,
+        cycleYear: EXAM_CYCLE_YEAR,
+      },
+    },
+  });
+
+  if (cycle?.phase === ExamCyclePhase.COMPLETE) {
+    return {
+      status: "cycle_ended",
+      examName: exam.name,
+      slug: exam.slug,
+      cycleYear: EXAM_CYCLE_YEAR,
+    };
   }
 
   const eventTypes = [...DEFAULT_BOT_EVENT_TYPES];

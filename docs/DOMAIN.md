@@ -28,6 +28,10 @@ Links a user to an exam with selected **event types**. One active subscription p
 
 A queued alert connecting an **Event** to a **Subscription**. Tracks delivery status to Telegram.
 
+### ExamCycle
+
+Tracks the current admissions cycle for an exam (e.g. JEE Advanced 2026). Milestone dates come from seed data and are refreshed from ingested events after each crawl. When the cycle reaches `COMPLETE`, notifications stop and the exam is hidden from new subscriptions — without archiving the exam record itself.
+
 ## Enums
 
 ### ExamStatus
@@ -35,7 +39,19 @@ A queued alert connecting an **Event** to a **Subscription**. Tracks delivery st
 | Value | Meaning |
 |-------|---------|
 | `ACTIVE` | Exam is monitored and available for subscription |
-| `ARCHIVED` | No longer actively monitored |
+| `ARCHIVED` | No longer actively monitored (manual, e.g. blocked crawler) |
+
+### ExamCyclePhase
+
+| Value | Meaning |
+|-------|---------|
+| `REGISTRATION` | Before registration closes |
+| `PRE_EXAM` | After registration closes, before exam day |
+| `POST_EXAM` | After exam day, before counselling ends |
+| `COUNSELLING` | Reserved for future counselling-specific rules |
+| `COMPLETE` | Cycle over; no new notifications or subscriptions for this year |
+
+`COMPLETE` is not the same as `ExamStatus.ARCHIVED`. An exam can stay `ACTIVE` across years while each year's `ExamCycle` row moves to `COMPLETE`.
 
 ### EventType
 
@@ -79,12 +95,15 @@ Currently only `TELEGRAM`. Stored on `User.preferredChannel`.
 - Events are tied to an exam and the source that produced them.
 - On first crawl, all visible announcements on a source page may be ingested. Use `shouldIngestAnnouncement()` (in `parsers/shared/`) when enabling new exams to limit historical floods.
 
-### Exam lifecycle (seed)
+### Exam lifecycle (seed + cycle)
 
 | Status | Crawled? | Subscribable? |
 |--------|----------|---------------|
-| `ACTIVE` + source `isActive` | Yes | Yes |
+| `ACTIVE` + source `isActive` + cycle not `COMPLETE` | Yes | Yes |
+| `ACTIVE` + cycle `COMPLETE` for current year | Yes (ingest only) | No |
 | `ARCHIVED` or source inactive | No | No |
+
+After each scheduled crawl, the crawler refreshes milestone dates from events and recomputes `ExamCycle.phase`. When counselling closes (or 90 days after exam day if counselling is unknown), the cycle becomes `COMPLETE`.
 
 Seed includes 11 engineering exams. **JEE Main**, **JEE Advanced**, **BITSAT**, **VITEEE**, **COMEDK UGET**, **MHT CET**, **WBJEE**, **KCET**, **MET**, and **SRMJEEE** are ACTIVE. **KIITEE** stays ARCHIVED until live fetch bypasses Cloudflare (parser + fixture tests are ready).
 

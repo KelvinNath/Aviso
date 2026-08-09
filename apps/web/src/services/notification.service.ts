@@ -1,13 +1,15 @@
 import {
   EventType,
+  ExamCyclePhase,
   NotificationStatus,
   NotifyPolicy,
   SubscriptionStatus,
   type Prisma,
 } from "@prisma/client";
 
-import { getActionableEventCutoffs } from "@/lib/is-actionable-event";
+import { getActionableEventCutoffs, isActionableEvent } from "@/lib/is-actionable-event";
 import { prisma } from "@/lib/prisma";
+import { CURRENT_CYCLE_YEAR } from "@/services/exam.service";
 import type {
   DashboardNotification,
   GetNotificationsOptions,
@@ -17,24 +19,31 @@ import type {
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
+const MAX_FETCH_MULTIPLIER = 5;
+
+type NotificationWithEvent = {
+  id: string;
+  status: NotificationStatus;
+  createdAt: Date;
+  deliveredAt: Date | null;
+  event: {
+    title: string;
+    summary: string;
+    type: EventType;
+    sourceUrl: string;
+    notifyPolicy: NotifyPolicy;
+    publishedAt: Date | null;
+    detectedAt: Date;
+    effectiveDate: Date | null;
+    exam: {
+      name: string;
+      slug: string;
+    };
+  };
+};
 
 function toDashboardNotification(
-  notification: {
-    id: string;
-    status: NotificationStatus;
-    createdAt: Date;
-    deliveredAt: Date | null;
-    event: {
-      title: string;
-      summary: string;
-      type: EventType;
-      sourceUrl: string;
-      exam: {
-        name: string;
-        slug: string;
-      };
-    };
-  },
+  notification: NotificationWithEvent,
 ): DashboardNotification {
   return {
     id: notification.id,
@@ -55,6 +64,16 @@ function buildActionableEventWhere(now: Date = new Date()): Prisma.EventWhereInp
 
   return {
     notifyPolicy: { not: NotifyPolicy.REFERENCE },
+    exam: {
+      NOT: {
+        cycles: {
+          some: {
+            cycleYear: CURRENT_CYCLE_YEAR,
+            phase: ExamCyclePhase.COMPLETE,
+          },
+        },
+      },
+    },
     AND: [
       {
         OR: [{ effectiveDate: null }, { effectiveDate: { gte: now } }],
@@ -98,6 +117,135 @@ function buildWhereClause(
   return where;
 }
 
+function isActionableNotification(
+  notification: NotificationWithEvent,
+  now: Date = new Date(),
+): boolean {
+  return isActionableEvent(
+    {
+      notifyPolicy: notification.event.notifyPolicy,
+      publishedAt: notification.event.publishedAt,
+      detectedAt: notification.event.detectedAt,
+      effectiveDate: notification.event.effectiveDate,
+    },
+    now,
+  );
+}
+
+const notificationSelect = {
+  id: true,
+  status: true,
+  createdAt: true,
+  deliveredAt: true,
+  event: {
+    select: {
+      title: true,
+      summary: true,
+      type: true,
+      sourceUrl: true,
+      notifyPolicy: true,
+      publishedAt: true,
+      detectedAt: true,
+      effectiveDate: true,
+      exam: {
+        select: {
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.NotificationSelect;
+
+async function fetchActionableNotifications(
+  where: Prisma.NotificationWhereInput,
+  skip: number,
+  take: number,
+  now: Date = new Date(),
+): Promise<NotificationWithEvent[]> {
+  const actionable: NotificationWithEvent[] = [];
+  let dbSkip = 0;
+  let skipped = 0;
+  const batchSize = 50;
+
+  while (actionable.length < take) {
+    const batch = await prisma.notification.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: dbSkip,
+      take: batchSize,
+      select: notificationSelect,
+    });
+
+    if (batch.length === 0) {
+      break;
+    }
+
+    for (const notification of batch) {
+      if (!isActionableNotification(notification, now)) {
+        continue;
+      }
+
+      if (skipped < skip) {
+        skipped += 1;
+        continue;
+      }
+
+      actionable.push(notification);
+
+      if (actionable.length === take) {
+        break;
+      }
+    }
+
+    dbSkip += batch.length;
+
+    if (batch.length < batchSize) {
+      break;
+    }
+
+    if (dbSkip > skip + take * MAX_FETCH_MULTIPLIER) {
+      break;
+    }
+  }
+
+  return actionable;
+}
+
+async function countActionableNotifications(
+  where: Prisma.NotificationWhereInput,
+  now: Date = new Date(),
+): Promise<number> {
+  const batchSize = 100;
+  let dbSkip = 0;
+  let total = 0;
+
+  while (true) {
+    const batch = await prisma.notification.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: dbSkip,
+      take: batchSize,
+      select: notificationSelect,
+    });
+
+    if (batch.length === 0) {
+      break;
+    }
+
+    total += batch.filter((notification) =>
+      isActionableNotification(notification, now),
+    ).length;
+    dbSkip += batch.length;
+
+    if (batch.length < batchSize) {
+      break;
+    }
+  }
+
+  return total;
+}
+
 /**
  * Returns paginated notifications for a user, scoped to active subscriptions.
  */
@@ -109,35 +257,11 @@ export async function getNotificationsByUserId(
   const limit = Math.min(Math.max(options.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
   const skip = (page - 1) * limit;
   const where = buildWhereClause(userId, options);
+  const now = new Date();
 
   const [totalCount, notifications] = await Promise.all([
-    prisma.notification.count({ where }),
-    prisma.notification.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        status: true,
-        createdAt: true,
-        deliveredAt: true,
-        event: {
-          select: {
-            title: true,
-            summary: true,
-            type: true,
-            sourceUrl: true,
-            exam: {
-              select: {
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
-      },
-    }),
+    countActionableNotifications(where, now),
+    fetchActionableNotifications(where, skip, limit, now),
   ]);
 
   const totalPages = totalCount === 0 ? 0 : Math.ceil(totalCount / limit);

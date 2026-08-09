@@ -40,10 +40,6 @@ async function createSubscription(
     return { ok: true };
   }
 
-  if (response.status === 409) {
-    return { ok: true };
-  }
-
   const data = (await response.json()) as { error?: string };
 
   return {

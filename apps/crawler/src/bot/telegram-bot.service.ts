@@ -17,6 +17,7 @@ import {
 } from "./telegram-exams.service.js";
 import {
   buildAlreadySubscribedMessage,
+  buildCycleEndedMessage,
   buildExamNotActiveMessage,
   buildExamNotFoundMessage,
   buildSubscribeSuccessMessage,
@@ -141,6 +142,16 @@ async function handleSubscribeCommand(chatId: number, text: string): Promise<voi
       await sendMessage(
         String(chatId),
         buildExamNotActiveMessage(result.examName, result.slug),
+      );
+      return;
+    case "cycle_ended":
+      await sendMessage(
+        String(chatId),
+        buildCycleEndedMessage(
+          result.examName,
+          result.slug,
+          result.cycleYear,
+        ),
       );
       return;
     case "already_subscribed":

@@ -59,7 +59,7 @@ export async function crawlExamSource(
     let notificationsQueued = 0;
 
     for (const event of newEvents) {
-      if (!shouldNotifyForEvent(event)) {
+      if (!(await shouldNotifyForEvent(event))) {
         continue;
       }
 

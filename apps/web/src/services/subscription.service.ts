@@ -1,5 +1,6 @@
 import { SubscriptionStatus, type EventType } from "@prisma/client";
 
+import { CURRENT_CYCLE_YEAR } from "@/services/exam.service";
 import { prisma } from "@/lib/prisma";
 
 type CreateSubscriptionInput = {
@@ -9,14 +10,24 @@ type CreateSubscriptionInput = {
 };
 
 /**
- * Creates a subscription linking a user to an exam with event type preferences.
- * Status defaults to ACTIVE via the database schema.
+ * Creates or reactivates a subscription linking a user to an exam.
+ * Cancelled subscriptions are reactivated; active ones get updated event types.
  */
 export async function createSubscription(input: CreateSubscriptionInput) {
-  return prisma.subscription.create({
-    data: {
+  return prisma.subscription.upsert({
+    where: {
+      userId_examId: {
+        userId: input.userId,
+        examId: input.examId,
+      },
+    },
+    create: {
       userId: input.userId,
       examId: input.examId,
+      eventTypes: input.eventTypes,
+    },
+    update: {
+      status: SubscriptionStatus.ACTIVE,
       eventTypes: input.eventTypes,
     },
   });
@@ -44,6 +55,14 @@ export async function findSubscriptionsByUserId(userId: string) {
           id: true,
           name: true,
           slug: true,
+          cycles: {
+            where: { cycleYear: CURRENT_CYCLE_YEAR },
+            select: {
+              phase: true,
+              cycleYear: true,
+            },
+            take: 1,
+          },
         },
       },
     },

@@ -7,5 +7,6 @@ export type ParsedEvent = {
   summary: string;
   sourceUrl: string;
   publishedAt?: Date;
+  effectiveDate?: Date;
   notifyPolicy?: NotifyPolicy;
 };

@@ -25,18 +25,19 @@ export const copy = {
     telegramConnected: "Telegram Connected ✅",
     telegramNotConnected: "Connect Telegram to receive notifications instantly.",
     removeSubscription: "Stop tracking",
+    cycleEndedBadge: (year: number) => `${year} cycle ended`,
     onboardingTitle: "Pick your battles",
     onboardingDescription:
       "Choose your exams and the updates you actually care about. We'll ignore the rest.",
     onboardingSubmit: "Start tracking",
-    notificationsTitle: "My Notifications",
+    notificationsTitle: "Actionable updates",
     notificationsDescription:
-      "The same updates we send on Telegram — always here even if Telegram is down.",
-    notificationsLoading: "Loading your updates...",
+      "Official exam updates that are still relevant right now. Older notices stay hidden once their deadline or exam date has passed.",
+    notificationsLoading: "Loading actionable updates...",
     notificationsLoadMore: "Load More",
-    notificationsEmptyTitle: "🎉 You're all caught up.",
+    notificationsEmptyTitle: "You're all caught up.",
     notificationsEmptyBody:
-      "No academic chaos today. We'll wake you up when something important happens.",
+      "Nothing urgent on your radar. Past deadlines and stale notices are hidden — we'll surface new ones when they matter.",
   },
 
   notifications: {

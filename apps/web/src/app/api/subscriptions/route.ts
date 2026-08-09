@@ -1,7 +1,11 @@
-import { EventType, Prisma } from "@prisma/client";
+import { EventType, ExamCyclePhase } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import {
+  CURRENT_CYCLE_YEAR,
+  getCurrentCyclePhase,
+} from "@/services/exam.service";
 import {
   createSubscription,
   findSubscriptionsByUserId,
@@ -68,6 +72,15 @@ export async function POST(request: Request) {
 
     const { examId, eventTypes } = body as SubscriptionRequestBody;
 
+    const cyclePhase = await getCurrentCyclePhase(examId);
+
+    if (cyclePhase === ExamCyclePhase.COMPLETE) {
+      return NextResponse.json(
+        { error: `${CURRENT_CYCLE_YEAR} cycle has ended for this exam` },
+        { status: 400 },
+      );
+    }
+
     const subscription = await createSubscription({
       userId: session.user.id,
       examId,
@@ -76,16 +89,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(subscription, { status: 201 });
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
-      return NextResponse.json(
-        { error: "Subscription already exists for this user and exam" },
-        { status: 409 },
-      );
-    }
-
     console.error("[POST /api/subscriptions]", error);
 
     return NextResponse.json(

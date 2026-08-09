@@ -4,6 +4,7 @@ import type { Element } from "domhandler";
 import type { ParsedEvent } from "../types/parsed-event.js";
 import { classifyAnnouncementTitle } from "./shared/classify-announcement.js";
 import { shouldIncludeCycleAnnouncement } from "./shared/cycle-filter.js";
+import { resolveEffectiveDateFromText } from "./shared/infer-effective-date.js";
 import { normalizeText } from "./shared/normalize-title.js";
 import type { Parser } from "./parser.js";
 
@@ -170,6 +171,7 @@ function parseCalendar($: cheerio.CheerioAPI): ParsedEvent[] {
         title,
         summary: truncateSummary(eventCell),
         sourceUrl: `${PAGE_URL}#calendar-${slugifyTitle(title)}`,
+        effectiveDate: resolveEffectiveDateFromText(dateCell),
       });
     });
   });

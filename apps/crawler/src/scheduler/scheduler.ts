@@ -5,6 +5,7 @@ import {
   crawlExamSource,
   type CrawlStatistics,
 } from "../crawler/crawler.service.js";
+import { refreshExamCycle } from "../services/exam-cycle.service.js";
 import { prisma } from "../lib/prisma.js";
 import { processPendingNotifications } from "../workers/notification.worker.js";
 
@@ -69,6 +70,7 @@ async function runWorkerPhase(): Promise<{
 async function runScheduledCrawl(): Promise<void> {
   const startedAt = performance.now();
   const crawlResults: SourceCrawlResult[] = [];
+  const crawledExamIds = new Set<string>();
 
   console.log(DIVIDER);
   console.log("Starting scheduled crawl...\n");
@@ -107,6 +109,7 @@ async function runScheduledCrawl(): Promise<void> {
         examName: source.exam.name,
         statistics,
       });
+      crawledExamIds.add(source.examId);
 
       if (statistics.ok) {
         console.log("Fetched HTML");
@@ -134,7 +137,34 @@ async function runScheduledCrawl(): Promise<void> {
           error: message,
         },
       });
+      crawledExamIds.add(source.examId);
     }
+  }
+
+  if (crawledExamIds.size > 0) {
+    console.log("Cycle refresh");
+
+    for (const examId of crawledExamIds) {
+      try {
+        const previous = await prisma.examCycle.findFirst({
+          where: { examId },
+          orderBy: { cycleYear: "desc" },
+        });
+        const updated = await refreshExamCycle(examId);
+
+        if (previous && previous.phase !== updated.phase) {
+          const exam = sources.find((source) => source.examId === examId)?.exam;
+          console.log(
+            `[scheduler] ${exam?.name ?? examId}: ${previous.phase} → ${updated.phase}`,
+          );
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(`[scheduler] Cycle refresh failed (${examId}): ${message}`);
+      }
+    }
+
+    console.log("");
   }
 
   if (crawlResults.length > 0) {

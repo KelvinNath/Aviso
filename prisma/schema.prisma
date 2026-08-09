@@ -43,6 +43,14 @@ enum NotifyPolicy {
   REFERENCE
 }
 
+enum ExamCyclePhase {
+  REGISTRATION
+  PRE_EXAM
+  POST_EXAM
+  COUNSELLING
+  COMPLETE
+}
+
 model Exam {
   id        String     @id @default(cuid())
   name      String
@@ -54,6 +62,25 @@ model Exam {
   examSources   ExamSource[]
   events        Event[]
   subscriptions Subscription[]
+  cycles        ExamCycle[]
+}
+
+model ExamCycle {
+  id                String         @id @default(cuid())
+  examId            String
+  cycleYear         Int
+  phase             ExamCyclePhase @default(REGISTRATION)
+  registrationClose DateTime?
+  examDate          DateTime?
+  counsellingClose  DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  exam Exam @relation(fields: [examId], references: [id])
+
+  @@unique([examId, cycleYear])
+  @@index([examId, phase])
 }
 
 model ExamSource {

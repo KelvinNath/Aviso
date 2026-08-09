@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import type { ParsedEvent } from "../types/parsed-event.js";
 import { classifyAnnouncementTitle } from "./shared/classify-announcement.js";
 import { shouldIncludeCycleAnnouncement } from "./shared/cycle-filter.js";
+import { resolveEffectiveDateFromText } from "./shared/infer-effective-date.js";
 import { normalizeText } from "./shared/normalize-title.js";
 import type { Parser } from "./parser.js";
 
@@ -60,6 +61,7 @@ function parseTimelineTable($: cheerio.CheerioAPI): ParsedEvent[] {
       title,
       summary: dateRange,
       sourceUrl: `${BASE_URL}#timeline-${phase.toLowerCase().replace(/\s+/g, "-")}-exam`,
+      effectiveDate: resolveEffectiveDateFromText(dateRange),
     });
   }
 
@@ -87,6 +89,7 @@ function parseTimelineTable($: cheerio.CheerioAPI): ParsedEvent[] {
       title,
       summary: deadline,
       sourceUrl: `${BASE_URL}#timeline-${phase.toLowerCase().replace(/\s+/g, "-")}-deadline`,
+      effectiveDate: resolveEffectiveDateFromText(deadline),
     });
   }
 

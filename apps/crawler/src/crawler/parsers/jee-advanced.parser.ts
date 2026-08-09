@@ -4,6 +4,7 @@ import type { Element } from "domhandler";
 import type { ParsedEvent } from "../types/parsed-event.js";
 import { shouldIncludeJeeAdvancedAnnouncement } from "./jee-advanced/cycle-filter.js";
 import { getJeeAdvancedNotifyPolicy } from "./jee-advanced/notify-policy.js";
+import { applyEffectiveDate } from "./shared/infer-effective-date.js";
 import { classifyAnnouncementTitle } from "./shared/classify-announcement.js";
 import { normalizeText } from "./shared/normalize-title.js";
 import type { Parser } from "./parser.js";
@@ -98,14 +99,14 @@ function parseAnnouncementBlock($block: CheerioBlock): ParsedEvent | undefined {
     return undefined;
   }
 
-  return {
+  return applyEffectiveDate({
     type: classifyAnnouncementTitle(title),
     title,
     summary: extractSummary($block),
     sourceUrl: extractSourceUrl($block, title),
     publishedAt,
     notifyPolicy: getJeeAdvancedNotifyPolicy(title),
-  };
+  });
 }
 
 /**

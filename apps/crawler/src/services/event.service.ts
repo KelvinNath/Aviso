@@ -1,8 +1,13 @@
 import { Prisma, type Event } from "@prisma/client";
 
 import type { ParsedEvent } from "../crawler/types/parsed-event.js";
+import { applyEffectiveDate } from "../crawler/parsers/shared/infer-effective-date.js";
 import { prisma } from "../lib/prisma.js";
 import { buildEventFingerprint } from "./fingerprint.js";
+
+function enrichParsedEvent(parsed: ParsedEvent): ParsedEvent {
+  return applyEffectiveDate(parsed);
+}
 
 /**
  * Persists parsed events from the crawler into the database.
@@ -20,7 +25,8 @@ export async function ingestEvents(
 ): Promise<Event[]> {
   const createdEvents: Event[] = [];
 
-  for (const parsed of events) {
+  for (const parsedInput of events) {
+    const parsed = enrichParsedEvent(parsedInput);
     const fingerprint = buildEventFingerprint(
       examId,
       parsed.title,
@@ -46,6 +52,7 @@ export async function ingestEvents(
           sourceUrl: parsed.sourceUrl,
           fingerprint,
           publishedAt: parsed.publishedAt ?? null,
+          effectiveDate: parsed.effectiveDate ?? null,
           notifyPolicy: parsed.notifyPolicy ?? "ALERT",
           detectedAt: new Date(),
         },

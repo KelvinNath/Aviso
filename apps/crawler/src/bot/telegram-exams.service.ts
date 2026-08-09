@@ -1,14 +1,23 @@
-import { ExamStatus, SubscriptionStatus } from "@prisma/client";
+import { ExamCyclePhase, ExamStatus, SubscriptionStatus } from "@prisma/client";
 
+import { EXAM_CYCLE_YEAR } from "../services/exam-cycle.service.js";
 import { prisma } from "../lib/prisma.js";
 
 /**
- * Returns all exams available for subscription (ACTIVE status only).
+ * Returns all exams available for subscription (ACTIVE status, live cycle only).
  */
 export async function listActiveExams() {
   return prisma.exam.findMany({
     where: {
       status: ExamStatus.ACTIVE,
+      NOT: {
+        cycles: {
+          some: {
+            cycleYear: EXAM_CYCLE_YEAR,
+            phase: ExamCyclePhase.COMPLETE,
+          },
+        },
+      },
     },
     orderBy: {
       name: "asc",
@@ -27,7 +36,7 @@ export function buildExamsListMessage(
     .map((exam) => `• ${exam.name} — /subscribe ${exam.slug}`)
     .join("\n");
 
-  return `Available exams:\n\n${examLines}\n\nSubscribe with /subscribe <slug>`;
+  return `Available exams:\n\n${examLines}\n\nSubscribe with /subscribe <exam-slug>`;
 }
 
 export function buildSubscribeUsageMessage(

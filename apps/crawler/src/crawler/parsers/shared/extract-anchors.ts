@@ -2,6 +2,7 @@ import type { CheerioAPI } from "cheerio";
 import type { EventType } from "@prisma/client";
 
 import type { ParsedEvent } from "../../types/parsed-event.js";
+import { applyEffectiveDate } from "./infer-effective-date.js";
 import { normalizeText } from "./normalize-title.js";
 import { shouldIngestAnnouncement } from "./should-ingest-announcement.js";
 
@@ -44,12 +45,12 @@ function parseAnchor(
     return undefined;
   }
 
-  return {
+  return applyEffectiveDate({
     type: classifyFn(normalizedTitle),
     title: normalizedTitle,
     summary: "",
     sourceUrl,
-  };
+  });
 }
 
 type ExtractAnchorAnnouncementsOptions = {

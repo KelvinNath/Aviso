@@ -10,7 +10,8 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { HoverLift } from "@/components/motion/hover-lift";
 import { copy } from "@/lib/copy";
 import { formatEventTypes } from "@/lib/event-types";
-import type { EventType } from "@prisma/client";
+import type { EventType, ExamCyclePhase } from "@prisma/client";
+import { ExamCyclePhase as ExamCyclePhaseEnum } from "@prisma/client";
 
 type SubscriptionItem = {
   id: string;
@@ -19,6 +20,10 @@ type SubscriptionItem = {
     id: string;
     name: string;
     slug: string;
+    cycles: Array<{
+      phase: ExamCyclePhase;
+      cycleYear: number;
+    }>;
   };
 };
 
@@ -79,7 +84,12 @@ export function SubscriptionList({ subscriptions }: SubscriptionListProps) {
         </motion.p>
       )}
 
-      {subscriptions.map((subscription, index) => (
+      {subscriptions.map((subscription, index) => {
+        const currentCycle = subscription.exam.cycles[0];
+        const cycleEnded =
+          currentCycle?.phase === ExamCyclePhaseEnum.COMPLETE;
+
+        return (
         <motion.div
           key={subscription.id}
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
@@ -92,7 +102,13 @@ export function SubscriptionList({ subscriptions }: SubscriptionListProps) {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <CardTitle>{subscription.exam.name}</CardTitle>
-                    <Badge variant="lime">Active</Badge>
+                    {cycleEnded ? (
+                      <Badge variant="coral">
+                        {copy.dashboard.cycleEndedBadge(currentCycle.cycleYear)}
+                      </Badge>
+                    ) : (
+                      <Badge variant="lime">Active</Badge>
+                    )}
                   </div>
                   <CardDescription className="text-base">
                     {formatEventTypes(subscription.eventTypes)}
@@ -114,7 +130,8 @@ export function SubscriptionList({ subscriptions }: SubscriptionListProps) {
             </Card>
           </HoverLift>
         </motion.div>
-      ))}
+        );
+      })}
     </div>
   );
 }
