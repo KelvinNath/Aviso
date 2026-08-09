@@ -1,5 +1,9 @@
 import { EventType, type Event } from "@prisma/client";
 
+import type { TelegramInlineKeyboardMarkup } from "../adapters/telegram.types.js";
+import { notificationKeyboard } from "./telegram-keyboard.js";
+import { getSiteUrl } from "./telegram-site-config.js";
+
 const MARKDOWN_V2_ESCAPE_PATTERN = /[_*[\]()~`>#+\-=|{}.!\\]/g;
 
 type TypeHeading = {
@@ -21,6 +25,11 @@ const EVENT_TYPE_HEADINGS: Partial<Record<EventType, TypeHeading>> = {
 const DEFAULT_TYPE_HEADING: TypeHeading = {
   emoji: "📢",
   label: "New Update",
+};
+
+export type TelegramNotificationPayload = {
+  text: string;
+  replyMarkup: TelegramInlineKeyboardMarkup;
 };
 
 /**
@@ -45,22 +54,16 @@ function bold(text: string): string {
   return `*${escapeMarkdownV2(text)}*`;
 }
 
-function formatLink(sourceUrl: string): string {
-  const label = escapeMarkdownV2("🔗 Official notice");
-  const url = escapeMarkdownV2Url(sourceUrl);
-
-  return `[${label}](${url})`;
-}
-
 /**
  * Formats an exam event into a Telegram MarkdownV2 notification message.
  */
 export function formatTelegramNotification(
   event: Event,
   examName: string,
-): string {
+): TelegramNotificationPayload {
   const typeHeading = getTypeHeading(event.type);
   const summary = event.summary.trim();
+  const sourceUrl = event.sourceUrl.trim();
 
   const lines = [
     `🎓 ${bold(`${examName} Update`)}`,
@@ -76,21 +79,22 @@ export function formatTelegramNotification(
 
   lines.push(
     "",
-    escapeMarkdownV2("This notification was generated automatically."),
+    escapeMarkdownV2(
+      "No need to keep refreshing the website — this one made it to AvisoMe. 😄",
+    ),
   );
-
-  if (event.sourceUrl.trim()) {
-    lines.push("", formatLink(event.sourceUrl.trim()));
-  }
 
   lines.push(
     "",
-    "━━━━━━━━━━━━━━",
+    "──────────────",
     "",
-    `${escapeMarkdownV2("You're receiving this because you're subscribed to")} ${bold(examName)}${escapeMarkdownV2(".")}`,
-    "",
-    escapeMarkdownV2("Use /unsubscribe <exam-slug> to stop notifications."),
+    `${escapeMarkdownV2("You're receiving this because you're tracking")} ${bold(examName)} ${escapeMarkdownV2("on AvisoMe.")}`,
   );
 
-  return lines.join("\n");
+  return {
+    text: lines.join("\n"),
+    replyMarkup: sourceUrl
+      ? notificationKeyboard(sourceUrl)
+      : notificationKeyboard(getSiteUrl()),
+  };
 }

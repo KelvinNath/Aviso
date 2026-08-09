@@ -36,9 +36,12 @@ export async function processPendingNotifications(): Promise<void> {
         throw new Error("User has no telegramChatId");
       }
 
-      const message = formatTelegramNotification(event, event.exam.name);
+      const telegramPayload = formatTelegramNotification(event, event.exam.name);
 
-      await sendMessage(user.telegramChatId, message, "MarkdownV2");
+      await sendMessage(user.telegramChatId, telegramPayload.text, {
+        parseMode: "MarkdownV2",
+        replyMarkup: telegramPayload.replyMarkup,
+      });
 
       await prisma.notification.update({
         where: { id: notification.id },

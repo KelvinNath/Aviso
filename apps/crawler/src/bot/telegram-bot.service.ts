@@ -1,31 +1,38 @@
 import { EventType } from "@prisma/client";
 
 import { getUpdates, sendMessage } from "../adapters/telegram.adapter.js";
+import type { BotMessagePayload } from "./bot-content.js";
 import {
-  getHelpMessage,
-  getNotRegisteredMessage,
-  getWelcomeMessage,
+  getConnectedExamsMessage,
+  getConnectedHelpMessage,
+  getConnectedStartMessage,
+  getConnectedStatusMessage,
+  getConnectedSubscribeRedirectMessage,
+  getConnectedUnsubscribeRedirectMessage,
+  getEmptyExamsMessage,
+  getLinkInvalidMessage,
+  getLinkSuccessMessage,
+  getSubscribeRedirectMessage,
+  getUnsubscribeRedirectMessage,
+  getVisitorExamsMessage,
+  getVisitorHelpMessage,
+  getVisitorStartMessage,
+  getVisitorStatusMessage,
 } from "./bot-content.js";
 import {
-  linkTelegramAccountWithCode,
-} from "./telegram-link.service.js";
+  countActiveSubscriptions,
+  findUserByTelegramChatId,
+  getTelegramAccountState,
+  isConnectedAvisoUser,
+} from "./telegram-account.service.js";
 import {
-  buildExamsListMessage,
-  buildSubscribeUsageMessage,
-  buildUnsubscribeUsageMessage,
-  listActiveExams,
-} from "./telegram-exams.service.js";
-import {
-  buildAlreadySubscribedMessage,
-  buildCycleEndedMessage,
-  buildExamNotActiveMessage,
-  buildExamNotFoundMessage,
-  buildSubscribeSuccessMessage,
-  buildUnsubscribeSuccessMessage,
-  subscribeToExam,
-  unsubscribeFromExam,
-} from "./telegram-subscription.service.js";
-import { getSubscriptionStatus } from "./telegram-status.service.js";
+  setConnectedCommandScope,
+  setDefaultVisitorCommands,
+  setVisitorCommandScope,
+} from "./telegram-commands.service.js";
+import { listActiveExams, listTrackedExamNames } from "./telegram-exams.service.js";
+import { linkTelegramAccountWithCode } from "./telegram-link.service.js";
+import { getActiveSubscriptionSummaries } from "./telegram-status.service.js";
 import {
   isAdminChat,
   sendTestNotification,
@@ -48,7 +55,7 @@ const TEST_EVENT_MAP: Record<string, EventType> = {
   counsellingclose: EventType.COUNSELLING_CLOSE,
 };
 
-function getCommand(text: string | undefined): string | null {
+export function getCommand(text: string | undefined): string | null {
   if (!text) {
     return null;
   }
@@ -56,18 +63,7 @@ function getCommand(text: string | undefined): string | null {
   return text.trim().split(/\s+/)[0]?.split("@")[0] ?? null;
 }
 
-function parseCommandArgs(text: string): string | null {
-  const trimmed = text.trim();
-  const parts = trimmed.split(/\s+/);
-
-  if (parts.length < 2) {
-    return null;
-  }
-
-  return parts.slice(1).join(" ").trim().toLowerCase() || null;
-}
-
-function parseStartPayload(text: string): string | null {
+export function parseStartPayload(text: string): string | null {
   const trimmed = text.trim();
   const [commandToken, ...rest] = trimmed.split(/\s+/);
   const command = commandToken?.split("@")[0];
@@ -78,6 +74,16 @@ function parseStartPayload(text: string): string | null {
 
   const payload = rest.join(" ").trim();
   return payload.length > 0 ? payload : null;
+}
+
+async function sendBotMessage(
+  chatId: number | string,
+  payload: BotMessagePayload,
+): Promise<void> {
+  await sendMessage(String(chatId), payload.text, {
+    parseMode: payload.parseMode,
+    replyMarkup: payload.replyMarkup,
+  });
 }
 
 async function handleStartCommand(
@@ -92,19 +98,33 @@ async function handleStartCommand(
       chatId,
     );
 
-    await sendMessage(String(chatId), result.message);
-
-    if (result.status === "success") {
-      console.log(
-        `[bot] Linked Telegram ${telegramUser.username ?? telegramUser.id} via deep link`,
-      );
+    if (result.status === "invalid") {
+      await sendBotMessage(chatId, getLinkInvalidMessage());
+      return;
     }
 
+    const trackedExamCount = await countActiveSubscriptions(result.userId);
+    await setConnectedCommandScope(chatId);
+    await sendBotMessage(chatId, getLinkSuccessMessage(trackedExamCount));
+
+    console.log(
+      `[bot] Linked Telegram ${telegramUser.username ?? telegramUser.id} via deep link`,
+    );
+    return;
+  }
+
+  const existingUser = await findUserByTelegramChatId(String(chatId));
+
+  if (existingUser && isConnectedAvisoUser(existingUser)) {
+    const trackedExamCount = await countActiveSubscriptions(existingUser.id);
+    await setConnectedCommandScope(chatId);
+    await sendBotMessage(chatId, getConnectedStartMessage(trackedExamCount));
     return;
   }
 
   await upsertTelegramUser(telegramUser, chatId);
-  await sendMessage(String(chatId), getWelcomeMessage(), "MarkdownV2");
+  await setVisitorCommandScope(chatId);
+  await sendBotMessage(chatId, getVisitorStartMessage());
 
   console.log(
     `[bot] Registered ${telegramUser.username ?? telegramUser.id} (chat ${chatId})`,
@@ -112,104 +132,75 @@ async function handleStartCommand(
 }
 
 async function handleHelpCommand(chatId: number): Promise<void> {
-  await sendMessage(String(chatId), getHelpMessage(), "MarkdownV2");
+  const user = await findUserByTelegramChatId(String(chatId));
+  const state = getTelegramAccountState(user);
+
+  if (state === "connected") {
+    await sendBotMessage(chatId, getConnectedHelpMessage());
+    return;
+  }
+
+  await sendBotMessage(chatId, getVisitorHelpMessage());
 }
 
 async function handleExamsCommand(chatId: number): Promise<void> {
   const exams = await listActiveExams();
-  await sendMessage(String(chatId), buildExamsListMessage(exams));
-}
 
-async function handleSubscribeCommand(chatId: number, text: string): Promise<void> {
-  const slug = parseCommandArgs(text);
-
-  if (!slug) {
-    const exams = await listActiveExams();
-    await sendMessage(String(chatId), buildSubscribeUsageMessage(exams));
+  if (exams.length === 0) {
+    await sendBotMessage(chatId, getEmptyExamsMessage());
     return;
   }
 
-  const result = await subscribeToExam(String(chatId), slug);
+  const user = await findUserByTelegramChatId(String(chatId));
+  const state = getTelegramAccountState(user);
 
-  switch (result.status) {
-    case "not_registered":
-      await sendMessage(String(chatId), getNotRegisteredMessage(), "MarkdownV2");
-      return;
-    case "exam_not_found":
-      await sendMessage(String(chatId), buildExamNotFoundMessage(result.slug));
-      return;
-    case "exam_not_active":
-      await sendMessage(
-        String(chatId),
-        buildExamNotActiveMessage(result.examName, result.slug),
-      );
-      return;
-    case "cycle_ended":
-      await sendMessage(
-        String(chatId),
-        buildCycleEndedMessage(
-          result.examName,
-          result.slug,
-          result.cycleYear,
-        ),
-      );
-      return;
-    case "already_subscribed":
-      await sendMessage(
-        String(chatId),
-        buildAlreadySubscribedMessage(result.examName),
-      );
-      return;
-    case "subscribed":
-      await sendMessage(
-        String(chatId),
-        buildSubscribeSuccessMessage(result.examName, result.eventTypes),
-      );
-      console.log(`[bot] Subscribed chat ${chatId} to ${result.examName}`);
-      return;
+  if (state === "connected" && user) {
+    const trackedExamNames = await listTrackedExamNames(user.id);
+    await sendBotMessage(
+      chatId,
+      getConnectedExamsMessage(exams, trackedExamNames),
+    );
+    return;
   }
+
+  await sendBotMessage(chatId, getVisitorExamsMessage(exams));
 }
 
 async function handleStatusCommand(chatId: number): Promise<void> {
-  const message = await getSubscriptionStatus(String(chatId));
-  await sendMessage(String(chatId), message);
-}
+  const user = await findUserByTelegramChatId(String(chatId));
+  const state = getTelegramAccountState(user);
 
-async function handleUnsubscribeCommand(
-  chatId: number,
-  text: string,
-): Promise<void> {
-  const slug = parseCommandArgs(text);
-
-  if (!slug) {
-    const message = await buildUnsubscribeUsageMessage(String(chatId));
-    await sendMessage(String(chatId), message);
+  if (state !== "connected") {
+    await sendBotMessage(chatId, getVisitorStatusMessage());
     return;
   }
 
-  const result = await unsubscribeFromExam(String(chatId), slug);
+  const subscriptions = await getActiveSubscriptionSummaries(String(chatId));
+  await sendBotMessage(chatId, getConnectedStatusMessage(subscriptions));
+}
 
-  switch (result.status) {
-    case "not_registered":
-      await sendMessage(String(chatId), "Please send /start first.");
-      return;
-    case "exam_not_found":
-      await sendMessage(String(chatId), buildExamNotFoundMessage(result.slug));
-      return;
-    case "not_subscribed":
-      await sendMessage(
-        String(chatId),
-        `You're not subscribed to ${result.examName}.`,
-      );
-      return;
-    case "unsubscribed":
-      await sendMessage(
-        String(chatId),
-        buildUnsubscribeSuccessMessage(result.examName, result.slug),
-      );
-      console.log(`[bot] Unsubscribed chat ${chatId} from ${result.examName}`);
-      return;
+async function handleSubscribeCommand(chatId: number): Promise<void> {
+  const user = await findUserByTelegramChatId(String(chatId));
+  const state = getTelegramAccountState(user);
+
+  if (state === "connected") {
+    await sendBotMessage(chatId, getConnectedSubscribeRedirectMessage());
+    return;
   }
+
+  await sendBotMessage(chatId, getSubscribeRedirectMessage());
+}
+
+async function handleUnsubscribeCommand(chatId: number): Promise<void> {
+  const user = await findUserByTelegramChatId(String(chatId));
+  const state = getTelegramAccountState(user);
+
+  if (state === "connected") {
+    await sendBotMessage(chatId, getConnectedUnsubscribeRedirectMessage());
+    return;
+  }
+
+  await sendBotMessage(chatId, getUnsubscribeRedirectMessage());
 }
 
 async function handleTestCommand(chatId: number, text: string): Promise<void> {
@@ -235,7 +226,7 @@ async function handleTestCommand(chatId: number, text: string): Promise<void> {
   );
 }
 
-async function handleUpdate(update: TelegramUpdate): Promise<void> {
+export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   const message = update.message;
 
   if (!message?.text) {
@@ -275,7 +266,7 @@ async function handleUpdate(update: TelegramUpdate): Promise<void> {
   }
 
   if (command === "/subscribe") {
-    await handleSubscribeCommand(message.chat.id, text);
+    await handleSubscribeCommand(message.chat.id);
     return;
   }
 
@@ -285,11 +276,9 @@ async function handleUpdate(update: TelegramUpdate): Promise<void> {
   }
 
   if (command === "/unsubscribe") {
-    await handleUnsubscribeCommand(message.chat.id, text);
+    await handleUnsubscribeCommand(message.chat.id);
     return;
   }
-
-  // Future commands: /latest, /settings, /feedback — add handlers above.
 }
 
 /**
@@ -307,6 +296,7 @@ export async function startTelegramBotPolling(): Promise<void> {
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
 
+  await setDefaultVisitorCommands();
   console.log("[bot] Telegram polling started");
 
   while (running) {

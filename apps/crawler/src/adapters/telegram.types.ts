@@ -28,3 +28,31 @@ export type TelegramGetUpdatesResponse = {
   ok: boolean;
   result: TelegramUpdate[];
 };
+
+export type TelegramBotCommand = {
+  command: string;
+  description: string;
+};
+
+export type TelegramInlineKeyboardButton = {
+  text: string;
+  url?: string;
+  callback_data?: string;
+};
+
+export type TelegramInlineKeyboardMarkup = {
+  inline_keyboard: TelegramInlineKeyboardButton[][];
+};
+
+export type TelegramBotCommandScope =
+  | { type: "default" }
+  | { type: "chat"; chat_id: number | string };
+
+export type SendMessageOptions = {
+  parseMode?: "MarkdownV2";
+  replyMarkup?: TelegramInlineKeyboardMarkup;
+};
+
+export type TelegramApiResponse = {
+  ok: boolean;
+};

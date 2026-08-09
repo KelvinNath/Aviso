@@ -147,7 +147,10 @@ export async function sendTestNotification(
   }
 
   const mockEvent = buildMockEvent(exam.id, type);
-  const message = formatTelegramNotification(mockEvent, exam.name);
+  const notification = formatTelegramNotification(mockEvent, exam.name);
 
-  await sendMessage(chatId, message, "MarkdownV2");
+  await sendMessage(chatId, notification.text, {
+    parseMode: "MarkdownV2",
+    replyMarkup: notification.replyMarkup,
+  });
 }

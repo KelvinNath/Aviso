@@ -1,4 +1,11 @@
-import type { TelegramGetUpdatesResponse, TelegramUpdate } from "./telegram.types.js";
+import type {
+  SendMessageOptions,
+  TelegramApiResponse,
+  TelegramBotCommand,
+  TelegramBotCommandScope,
+  TelegramGetUpdatesResponse,
+  TelegramUpdate,
+} from "./telegram.types.js";
 
 function getBotToken(): string {
   const token = process.env.BOT_TOKEN;
@@ -53,21 +60,63 @@ export async function getUpdates(
   return data.result;
 }
 
+export type { TelegramBotCommand, TelegramBotCommandScope };
+
+/**
+ * Sets the bot command menu for a scope (default or per-chat).
+ */
+export async function setMyCommands(
+  commands: TelegramBotCommand[],
+  scope?: TelegramBotCommandScope,
+): Promise<void> {
+  const body: Record<string, unknown> = { commands };
+
+  if (scope) {
+    body.scope = scope;
+  }
+
+  const data = await callTelegramApi<TelegramApiResponse>("setMyCommands", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!data.ok) {
+    throw new Error("Telegram setMyCommands returned ok: false");
+  }
+}
+
 /**
  * Sends a text message to a Telegram chat via the Bot API.
  */
 export async function sendMessage(
   chatId: string,
   message: string,
-  parseMode?: "MarkdownV2",
+  parseModeOrOptions?: "MarkdownV2" | SendMessageOptions,
 ): Promise<void> {
-  const body: Record<string, string> = {
+  let parseMode: "MarkdownV2" | undefined;
+  let replyMarkup: SendMessageOptions["replyMarkup"];
+
+  if (parseModeOrOptions === "MarkdownV2") {
+    parseMode = "MarkdownV2";
+  } else if (parseModeOrOptions) {
+    parseMode = parseModeOrOptions.parseMode;
+    replyMarkup = parseModeOrOptions.replyMarkup;
+  }
+
+  const body: Record<string, unknown> = {
     chat_id: chatId,
     text: message,
   };
 
   if (parseMode) {
     body.parse_mode = parseMode;
+  }
+
+  if (replyMarkup) {
+    body.reply_markup = replyMarkup;
   }
 
   await callTelegramApi("sendMessage", {

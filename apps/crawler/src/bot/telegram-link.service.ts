@@ -3,15 +3,9 @@ import { NotificationChannel } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import type { TelegramUser } from "../adapters/telegram.types.js";
 
-const LINK_INVALID_MESSAGE =
-  "This link is invalid or has expired.\n\nPlease generate a new one from your Aviso dashboard.";
-
-const LINK_SUCCESS_MESSAGE =
-  "✅ Telegram connected!\n\nYou'll now receive notifications instantly.";
-
 export type LinkTelegramResult =
-  | { status: "success"; message: string }
-  | { status: "invalid"; message: string };
+  | { status: "success"; userId: string }
+  | { status: "invalid" };
 
 function buildTelegramDisplayName(user: TelegramUser): string {
   const fullName = [user.first_name, user.last_name]
@@ -46,7 +40,7 @@ export async function linkTelegramAccountWithCode(
   const normalizedCode = code.trim().toUpperCase();
 
   if (!normalizedCode) {
-    return { status: "invalid", message: LINK_INVALID_MESSAGE };
+    return { status: "invalid" };
   }
 
   const user = await prisma.user.findFirst({
@@ -59,7 +53,7 @@ export async function linkTelegramAccountWithCode(
   });
 
   if (!user) {
-    return { status: "invalid", message: LINK_INVALID_MESSAGE };
+    return { status: "invalid" };
   }
 
   const telegramChatId = String(chatId);
@@ -96,13 +90,19 @@ export async function linkTelegramAccountWithCode(
     });
   });
 
-  return { status: "success", message: LINK_SUCCESS_MESSAGE };
+  return { status: "success", userId: user.id };
 }
 
-export function getTelegramLinkSuccessMessage(): string {
-  return LINK_SUCCESS_MESSAGE;
-}
-
-export function getTelegramLinkInvalidMessage(): string {
-  return LINK_INVALID_MESSAGE;
+/**
+ * Clears Telegram linkage for a user and restores visitor command scope on disconnect.
+ */
+export async function unlinkTelegramAccount(chatId: string): Promise<void> {
+  await prisma.user.updateMany({
+    where: { telegramChatId: chatId },
+    data: {
+      telegramChatId: null,
+      telegramUserId: null,
+      telegramUsername: null,
+    },
+  });
 }
