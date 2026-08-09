@@ -106,14 +106,14 @@ function EndedCycleSection({ exams }: { exams: EndedCycleExam[] }) {
           {copy.dashboard.trackEndedDescription}
         </p>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <ul className="grid grid-cols-2 gap-3">
         {exams.map((exam) => (
           <li key={exam.id}>
             <div
               className="flex flex-col gap-2 rounded-sticker brutal-border bg-aviso-light/50 p-4 opacity-70 dark:bg-aviso-dark/50"
               aria-disabled="true"
             >
-              <p className="font-heading text-lg font-bold uppercase">{exam.name}</p>
+              <p className="font-heading text-sm font-bold uppercase sm:text-lg">{exam.name}</p>
               <Badge variant="default">{copy.dashboard.trackEndedBadge(exam.cycleYear)}</Badge>
             </div>
           </li>
@@ -230,7 +230,7 @@ export function TrackWizard({
                   {copy.dashboard.trackAvailableHint}
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-2 gap-3">
                 {exams.map((exam) => {
                   const isSelected = selectedExam?.id === exam.id;
 
@@ -246,7 +246,7 @@ export function TrackWizard({
                           : "bg-aviso-light brutal-shadow-sm dark:bg-aviso-dark",
                       )}
                     >
-                      <p className="font-heading text-lg font-bold uppercase">
+                      <p className="font-heading text-sm font-bold uppercase sm:text-lg">
                         {exam.name}
                       </p>
                     </button>

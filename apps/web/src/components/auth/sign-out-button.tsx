@@ -1,17 +1,17 @@
+"use client";
+
 import { signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 
 export function SignOutButton() {
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signOut({ redirectTo: "/" });
-      }}
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => void signOut({ redirectTo: "/" })}
     >
-      <Button type="submit" variant="ghost" size="sm">
-        Sign out
-      </Button>
-    </form>
+      Sign out
+    </Button>
   );
 }
