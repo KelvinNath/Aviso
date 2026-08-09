@@ -1,0 +1,22 @@
+# Normalize line endings across macOS, Linux, and Windows checkouts.
+* text=auto eol=lf
+
+# Explicit text formats used in this repo.
+*.{ts,tsx,js,jsx,mjs,cjs} text eol=lf
+*.{json,md,yml,yaml,toml} text eol=lf
+*.{css,scss,html,svg} text eol=lf
+*.{sql,prisma,env,example} text eol=lf
+*.{sh,bash} text eol=lf
+
+# Windows-only scripts keep CRLF when present.
+*.{cmd,bat,ps1} text eol=crlf
+
+# Binary assets.
+*.{png,jpg,jpeg,gif,ico,webp,avif,pdf,zip,gz,woff,woff2,ttf,eot} binary
+
+# Reduce noisy lockfile diffs in reviews.
+package-lock.json text eol=lf -diff linguist-generated
+
+# Repo metadata.
+.gitattributes text eol=lf
+.gitignore text eol=lf
