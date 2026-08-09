@@ -38,6 +38,12 @@ export const copy = {
     trackStepEvents: "Choose updates",
     trackStepDone: "All set",
     trackExamPrompt: "Which exam do you want to track?",
+    trackAvailableSection: "Still in the game",
+    trackAvailableHint: "Pick one — we'll watch the official portal for you.",
+    trackEndedSection: (year: number) => `${year} cycle — curtain call`,
+    trackEndedDescription:
+      "These admissions rounds are over for now. No new tracking until the next cycle opens — we'll yell when that happens.",
+    trackEndedBadge: (year: number) => `${year} wrapped`,
     trackEventsPrompt: (examName: string) =>
       `What should we notify you about for ${examName}?`,
     trackContinue: "Continue",
@@ -51,7 +57,10 @@ export const copy = {
     trackGoDashboard: "Go to dashboard",
     trackAllCaughtUp: "All caught up",
     trackAllCaughtUpBody:
-      "You're already tracking every available exam. Nice.",
+      "You're already tracking every exam that's still open this cycle. Nice.",
+    trackNothingOpenTitle: "Nothing left to pick",
+    trackNothingOpenBody:
+      "Every open cycle is on your list already. The ones below have clocked out for the year — we'll be back when they reopen.",
     editTitle: (examName: string) => `${examName} preferences`,
     editDescription: "Choose which official updates you want to hear about.",
     editSave: "Save preferences",

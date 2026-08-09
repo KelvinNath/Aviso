@@ -12,6 +12,14 @@ export type MarketingExam = {
   status: "live" | "cycle_ended";
 };
 
+export type TrackExamOption = {
+  id: string;
+  name: string;
+  slug: string;
+  cycleYear: number;
+  cycleEnded: boolean;
+};
+
 /**
  * Returns active exams with a live admissions cycle for the configured year,
  * ordered alphabetically. Exams whose cycle is COMPLETE are excluded.
@@ -62,6 +70,32 @@ export async function getExamsForMarketing(): Promise<MarketingExam[]> {
       exam.cycles[0]?.phase === ExamCyclePhase.COMPLETE
         ? "cycle_ended"
         : "live",
+  }));
+}
+
+/**
+ * All ACTIVE exams with cycle status for the track wizard.
+ */
+export async function getExamsForTrack(): Promise<TrackExamOption[]> {
+  const cycleYear = getExamCycleYear();
+
+  const exams = await prisma.exam.findMany({
+    where: { status: ExamStatus.ACTIVE },
+    orderBy: { name: "asc" },
+    include: {
+      cycles: {
+        where: { cycleYear },
+        take: 1,
+      },
+    },
+  });
+
+  return exams.map((exam) => ({
+    id: exam.id,
+    name: exam.name,
+    slug: exam.slug,
+    cycleYear,
+    cycleEnded: exam.cycles[0]?.phase === ExamCyclePhase.COMPLETE,
   }));
 }
 

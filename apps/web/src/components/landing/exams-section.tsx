@@ -37,7 +37,7 @@ export function ExamsSection({ exams }: ExamsSectionProps) {
                 <Badge variant={exam.status === "live" ? "lime" : "default"}>
                   {exam.status === "live"
                     ? "Live"
-                    : `${exam.cycleYear} ended`}
+                    : copy.dashboard.trackEndedBadge(exam.cycleYear)}
                 </Badge>
               </div>
             </HoverLift>

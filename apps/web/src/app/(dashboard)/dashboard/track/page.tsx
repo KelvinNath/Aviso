@@ -9,7 +9,7 @@ import {
 } from "@/components/layout/section";
 import { copy } from "@/lib/copy";
 import { requireSession } from "@/lib/session";
-import { getActiveExams } from "@/services/exam.service";
+import { getExamsForTrack } from "@/services/exam.service";
 import { findSubscriptionsByUserId } from "@/services/subscription.service";
 
 export const metadata: Metadata = {
@@ -19,20 +19,21 @@ export const metadata: Metadata = {
 export default async function TrackExamPage() {
   const session = await requireSession();
   const [exams, subscriptions] = await Promise.all([
-    getActiveExams(),
+    getExamsForTrack(),
     findSubscriptionsByUserId(session.user.id),
   ]);
 
   const subscribedExamIds = new Set(
     subscriptions.map((subscription) => subscription.exam.id),
   );
-  const availableExams = exams
-    .filter((exam) => !subscribedExamIds.has(exam.id))
-    .map((exam) => ({
-      id: exam.id,
-      name: exam.name,
-      slug: exam.slug,
-    }));
+
+  const unsubscribed = exams.filter((exam) => !subscribedExamIds.has(exam.id));
+  const availableExams = unsubscribed
+    .filter((exam) => !exam.cycleEnded)
+    .map(({ id, name, slug }) => ({ id, name, slug }));
+  const endedCycleExams = unsubscribed
+    .filter((exam) => exam.cycleEnded)
+    .map(({ id, name, slug, cycleYear }) => ({ id, name, slug, cycleYear }));
 
   return (
     <main className="mx-auto max-w-2xl">
@@ -44,7 +45,10 @@ export default async function TrackExamPage() {
       </Reveal>
 
       <Reveal delay={0.1}>
-        <TrackWizard availableExams={availableExams} />
+        <TrackWizard
+          availableExams={availableExams}
+          endedCycleExams={endedCycleExams}
+        />
       </Reveal>
     </main>
   );

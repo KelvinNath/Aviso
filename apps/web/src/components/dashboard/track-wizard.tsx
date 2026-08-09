@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { EventTypePicker } from "@/components/dashboard/event-type-picker";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { copy } from "@/lib/copy";
@@ -17,8 +18,13 @@ export type ExamOption = {
   slug: string;
 };
 
+export type EndedCycleExam = ExamOption & {
+  cycleYear: number;
+};
+
 type TrackWizardProps = {
   availableExams: ExamOption[];
+  endedCycleExams: EndedCycleExam[];
 };
 
 type WizardStep = "exam" | "events" | "done";
@@ -80,9 +86,50 @@ function StepIndicator({ step }: { step: WizardStep }) {
   );
 }
 
-export function TrackWizard({ availableExams }: TrackWizardProps) {
+function EndedCycleSection({ exams }: { exams: EndedCycleExam[] }) {
+  if (exams.length === 0) {
+    return null;
+  }
+
+  const cycleYear = exams[0]?.cycleYear ?? new Date().getFullYear();
+
+  return (
+    <section
+      aria-label={copy.dashboard.trackEndedSection(cycleYear)}
+      className="space-y-3 rounded-sticker brutal-border border-dashed bg-aviso-dark/5 p-4 dark:bg-aviso-light/5"
+    >
+      <div>
+        <h3 className="font-heading text-sm font-bold uppercase tracking-wide opacity-80">
+          {copy.dashboard.trackEndedSection(cycleYear)}
+        </h3>
+        <p className="mt-1 font-body text-sm opacity-60">
+          {copy.dashboard.trackEndedDescription}
+        </p>
+      </div>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {exams.map((exam) => (
+          <li key={exam.id}>
+            <div
+              className="flex flex-col gap-2 rounded-sticker brutal-border bg-aviso-light/50 p-4 opacity-70 dark:bg-aviso-dark/50"
+              aria-disabled="true"
+            >
+              <p className="font-heading text-lg font-bold uppercase">{exam.name}</p>
+              <Badge variant="default">{copy.dashboard.trackEndedBadge(exam.cycleYear)}</Badge>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function TrackWizard({
+  availableExams,
+  endedCycleExams,
+}: TrackWizardProps) {
   const router = useRouter();
   const [exams, setExams] = useState(availableExams);
+  const [endedExams] = useState(endedCycleExams);
   const [step, setStep] = useState<WizardStep>("exam");
   const [selectedExam, setSelectedExam] = useState<ExamOption | null>(null);
   const [selectedEventTypes, setSelectedEventTypes] = useState<EventType[]>(
@@ -140,7 +187,9 @@ export function TrackWizard({ availableExams }: TrackWizardProps) {
     setError(null);
   }
 
-  if (exams.length === 0 && step !== "done") {
+  const nothingSelectable = exams.length === 0 && step !== "done";
+
+  if (nothingSelectable && endedExams.length === 0) {
     return (
       <Card variant="purple">
         <CardTitle>{copy.dashboard.trackAllCaughtUp}</CardTitle>
@@ -170,41 +219,67 @@ export function TrackWizard({ availableExams }: TrackWizardProps) {
       )}
 
       {step === "exam" && (
-        <div className="space-y-4">
-          <p className="font-body text-sm text-aviso-dark/70 dark:text-aviso-light/70">
-            {copy.dashboard.trackExamPrompt}
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {exams.map((exam) => {
-              const isSelected = selectedExam?.id === exam.id;
+        <div className="space-y-6">
+          {exams.length > 0 ? (
+            <section aria-label={copy.dashboard.trackAvailableSection} className="space-y-3">
+              <div>
+                <h3 className="font-heading text-sm font-bold uppercase tracking-wide">
+                  {copy.dashboard.trackAvailableSection}
+                </h3>
+                <p className="mt-1 font-body text-sm text-aviso-dark/70 dark:text-aviso-light/70">
+                  {copy.dashboard.trackAvailableHint}
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {exams.map((exam) => {
+                  const isSelected = selectedExam?.id === exam.id;
 
-              return (
-                <button
-                  key={exam.id}
-                  type="button"
-                  onClick={() => handleExamSelect(exam)}
-                  className={cn(
-                    "rounded-sticker brutal-border p-4 text-left transition-transform hover:-translate-y-0.5",
-                    isSelected
-                      ? "bg-aviso-lime brutal-shadow text-aviso-dark"
-                      : "bg-aviso-light brutal-shadow-sm dark:bg-aviso-dark",
-                  )}
-                >
-                  <p className="font-heading text-lg font-bold uppercase">
-                    {exam.name}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-          <Button
-            type="button"
-            arrow
-            disabled={!selectedExam}
-            onClick={() => setStep("events")}
-          >
-            {copy.dashboard.trackContinue}
-          </Button>
+                  return (
+                    <button
+                      key={exam.id}
+                      type="button"
+                      onClick={() => handleExamSelect(exam)}
+                      className={cn(
+                        "rounded-sticker brutal-border p-4 text-left transition-transform hover:-translate-y-0.5",
+                        isSelected
+                          ? "bg-aviso-lime brutal-shadow text-aviso-dark"
+                          : "bg-aviso-light brutal-shadow-sm dark:bg-aviso-dark",
+                      )}
+                    >
+                      <p className="font-heading text-lg font-bold uppercase">
+                        {exam.name}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+              <Button
+                type="button"
+                arrow
+                disabled={!selectedExam}
+                onClick={() => setStep("events")}
+              >
+                {copy.dashboard.trackContinue}
+              </Button>
+            </section>
+          ) : (
+            <Card variant="sky">
+              <CardTitle>{copy.dashboard.trackNothingOpenTitle}</CardTitle>
+              <CardDescription className="text-base">
+                {copy.dashboard.trackNothingOpenBody}
+              </CardDescription>
+              <Button
+                type="button"
+                variant="secondary"
+                className="mt-4"
+                onClick={() => router.push("/dashboard")}
+              >
+                {copy.dashboard.trackGoDashboard}
+              </Button>
+            </Card>
+          )}
+
+          <EndedCycleSection exams={endedExams} />
         </div>
       )}
 
