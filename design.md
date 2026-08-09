@@ -74,11 +74,13 @@ Configured in `apps/web/src/lib/fonts.ts`. Avoid using Inter as the primary face
 
 ```
 Stop refreshing
-NTA every
-15 minutes.
+exam portals
+every 15 minutes.
 ```
 
 Not: *"Never miss an update."*
+
+Subtext names multiple exams (JEE, BITSAT, COMEDK, state entrances) — Aviso is multi-exam, not single-portal.
 
 ---
 
@@ -114,7 +116,7 @@ Professional, witty, never cringe. Patterns live in `apps/web/src/lib/copy.ts`.
 |------------|-------|
 | Application deadline approaching. | That deadline you planned to remember? Yeah… it's tomorrow. |
 | Admit Card Released | Good news. No more guessing. Your admit card is live. |
-| Exam Date Updated | NTA changed the dates. Again. We've already updated them. |
+| Exam Date Updated | Dates moved again. We've already updated them. |
 | Result Declared | Deep breath. Results are out. |
 
 ### Dashboard voice
@@ -124,9 +126,11 @@ Professional, witty, never cringe. Patterns live in `apps/web/src/lib/copy.ts`.
 | Greeting | `Evening, Kelvin ☀️` |
 | Safe day | Nothing exploded today. You're safe. |
 | No new alerts | 🎉 You're all caught up. No academic chaos today. |
-| Footer | Peaceful day. We'll wake you when NTA does. |
+| Footer | Peaceful day. We'll ping you when an official portal moves. |
 
 **Brand promise:** We remember the deadlines. You remember the syllabus.
+
+**Final CTA:** We watch the portals. You watch the syllabus.
 
 ---
 
@@ -147,8 +151,8 @@ All motion gated by `prefers-reduced-motion` where implemented.
 
 ### Landing (`/`)
 
-1. Hero
-2. Supported exams
+1. Hero (multi-exam subtext)
+2. Supported exams (10 live)
 3. How Aviso works
 4. Features
 5. Telegram preview
@@ -158,24 +162,46 @@ All motion gated by `prefers-reduced-motion` where implemented.
 
 Components: `apps/web/src/components/landing/`
 
+Marketing copy and exam list: `apps/web/src/lib/landing-data.ts`, `apps/web/src/lib/copy.ts`.
+
 ### Sign-in (`/signin`)
 
 Google OAuth — "Almost there." + Continue with Google.
 
 ### Dashboard (`/dashboard`)
 
+Control panel only:
+
 - Greeting + Telegram connect card
-- Your exams (subscriptions)
-- **My Notifications** (filterable history)
-- Onboarding flow at `/dashboard/onboarding`
+- **Tracking settings** — subscription list with edit modal and stop tracking
+- Links to track wizard and notifications inbox
+
+### Track wizard (`/dashboard/track`)
+
+Two-step flow:
+
+1. Choose one exam
+2. Choose event types → save
+
+Success state offers "Track another exam" or "Go to dashboard". `/dashboard/onboarding` redirects here.
+
+### Notifications (`/dashboard/notifications`)
+
+- **Actionable updates** — hides stale events once `effectiveDate` has passed
+- Filterable by exam and event type; paginated
+- Same records as Telegram delivery
+
+### Edit preferences
+
+Modal on dashboard subscription cards — not a separate page. PATCH `/api/subscriptions/[id]`.
 
 ### Legal
 
 - `/privacy`, `/terms`
 
-### Design system preview
+### Design system preview (dev only)
 
-- `/design-system` — live component showcase
+- `/design-system` — live component showcase (not linked from public footer)
 
 ---
 
@@ -183,10 +209,10 @@ Google OAuth — "Almost there." + Continue with Google.
 
 | Channel | Role |
 |---------|------|
-| **Website** | Control center — auth, subscriptions, notification history |
+| **Website** | Control center — auth, tracking settings, actionable notification history |
 | **Telegram** | Delivery channel — instant alerts |
 
-The dashboard **My Notifications** section shows the same records as Telegram delivery, so students still see updates if Telegram is down.
+The notifications inbox shows the same records as Telegram delivery, filtered to what still matters today.
 
 ---
 

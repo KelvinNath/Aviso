@@ -2,7 +2,7 @@
 
 **Official information. Unofficial personality.**
 
-Aviso monitors official engineering entrance exam websites (starting with JEE Main) and delivers timely alerts to students via Telegram and the web dashboard.
+Aviso monitors official engineering entrance exam portals (JEE, BITSAT, COMEDK, state CETs, and more) and delivers timely alerts to students via Telegram and the web dashboard.
 
 ## Monorepo structure
 
@@ -11,7 +11,7 @@ Aviso/
 ├── apps/
 │   ├── web/          # Next.js 15 — landing, dashboard, auth, API routes
 │   └── crawler/      # Exam crawler, scheduler, Telegram bot, notification worker
-├── packages/         # Shared packages (scaffolding — not yet wired in)
+├── packages/         # Shared packages (shared-utils partially wired)
 ├── prisma/           # Schema and migrations (PostgreSQL)
 ├── docs/             # Architecture, domain, database documentation
 ├── design.md         # Brand and UI design system
@@ -82,16 +82,28 @@ npm run bot
 
 1. Open `http://localhost:3000/signin` (or your configured port)
 2. Sign in with Google
-3. On the dashboard, pick exams and connect Telegram via **Connect Telegram**
+3. Track at least one exam at `/dashboard/track`
+4. On the dashboard, connect Telegram via **Connect Telegram**
 
 ## Product flow
 
 | Channel | Role |
 |---------|------|
-| **Website** | Control center — sign in, manage subscriptions, view notification history |
+| **Website** | Control center — sign in, manage tracking settings, browse actionable notification history |
 | **Telegram** | Delivery channel — instant alerts when official updates are detected |
 
-When the crawler detects a new official event, it creates `Notification` rows for matching subscriptions. The worker sends Telegram messages; the dashboard **My Notifications** section shows the same history even if Telegram is down.
+When the crawler detects a new official event, it creates `Notification` rows for matching subscriptions. The worker sends Telegram messages; **My Notifications** (`/dashboard/notifications`) shows the same actionable history even if Telegram is down.
+
+## Dashboard routes
+
+| Route | Purpose |
+|-------|---------|
+| `/dashboard` | Control panel — Telegram linking, tracking settings |
+| `/dashboard/track` | Wizard — pick exam → choose event types → save |
+| `/dashboard/notifications` | Actionable inbox — filters stale events by `effectiveDate` |
+| `/dashboard/onboarding` | Redirects to `/dashboard/track` |
+
+Edit preferences for a tracked exam from the dashboard via an in-page modal (no separate edit route).
 
 ## Documentation
 

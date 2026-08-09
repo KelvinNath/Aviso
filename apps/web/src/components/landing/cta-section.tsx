@@ -30,7 +30,7 @@ export function CtaSection() {
           </div>
 
           <p className="mt-8 font-body text-sm opacity-60">
-            {copy.dashboard.peaceful}
+            {copy.landing.finalCta.footnote}
           </p>
         </div>
       </Reveal>

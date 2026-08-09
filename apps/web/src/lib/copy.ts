@@ -7,9 +7,9 @@ export const copy = {
   },
 
   hero: {
-    headline: ["Stop refreshing", "NTA every", "15 minutes."],
+    headline: ["Stop refreshing", "exam portals", "every 15 minutes."],
     subtext:
-      "Get official exam updates delivered to Telegram. No more guessing, no more F5.",
+      "JEE, BITSAT, COMEDK, state entrances — we watch official sources and ping you on Telegram when admit cards, dates, and results actually drop.",
     cta: "Save me from deadlines",
   },
 
@@ -17,7 +17,7 @@ export const copy = {
     greeting: (name: string) => `Morning, ${name} ☀️`,
     timeGreeting: (name: string, time: string) => `${time}, ${name} ☀️`,
     safe: "Nothing exploded today. You're safe.",
-    peaceful: "Peaceful day. We'll wake you when NTA does.",
+    peaceful: "Peaceful day. We'll ping you when an official portal moves.",
     title: "Dashboard",
     navDashboard: "Dashboard",
     navNotifications: "Notifications",
@@ -86,14 +86,14 @@ export const copy = {
     primary: "Save me from deadlines",
     secondary: "See how it works",
     telegram: "Open Telegram bot",
-    final: "Stop refreshing. Start living.",
+    final: "Close the tabs. Start living.",
   },
 
   landing: {
     exams: {
       title: "Exams we watch",
       description:
-        "Official sources. Zero coaching-blog nonsense. Starting with engineering entrances.",
+        "Official portals only — JEE, private universities, and state entrances. No coaching-blog rumours.",
     },
     howItWorks: {
       title: "How Aviso works",
@@ -115,12 +115,15 @@ export const copy = {
     },
     faq: {
       title: "Questions? Obviously.",
-      description: "The stuff everyone asks before they stop refreshing NTA.",
+      description:
+        "The stuff everyone asks before they hand portal-watching to us.",
     },
     finalCta: {
-      title: "Your F5 key deserves a break.",
+      title: "We watch the portals. You watch the syllabus.",
       description:
-        "Sign up, pick your exams, connect Telegram. We'll handle the rest.",
+        "Pick your exams, choose your alerts, connect Telegram — we'll ping you when official notices actually move.",
+      footnote:
+        "Official sources only. We'll surface what matters — not every rumour on the internet.",
     },
   },
 } as const;

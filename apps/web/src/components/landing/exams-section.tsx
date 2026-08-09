@@ -20,7 +20,7 @@ export function ExamsSection() {
         </SectionHeader>
       </Reveal>
 
-      <StaggerReveal className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <StaggerReveal className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {supportedExams.map((exam) => (
           <StaggerItem key={exam.slug}>
             <HoverLift>

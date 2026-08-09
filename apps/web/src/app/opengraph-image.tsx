@@ -44,7 +44,7 @@ export default function OpenGraphImage() {
             lineHeight: 0.95,
           }}
         >
-          NTA every
+          exam portals
         </div>
         <div
           style={{

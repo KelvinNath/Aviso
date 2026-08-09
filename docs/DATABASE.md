@@ -168,11 +168,21 @@ npx prisma studio
 Notification
   WHERE subscription.userId = :userId
     AND subscription.status = ACTIVE
+    AND (event.effectiveDate IS NULL OR event.effectiveDate >= now)
   INCLUDE event.exam
   ORDER BY createdAt DESC
 ```
 
-Implemented in `apps/web/src/services/notification.service.ts`.
+Additional client-side filtering via `isActionableEvent()` for result/answer-key freshness. Implemented in `apps/web/src/services/notification.service.ts`.
+
+### Subscription upsert (track wizard)
+
+```
+Subscription UPSERT ON (userId, examId)
+  SET status = ACTIVE, eventTypes = :selected
+```
+
+Reactivates `CANCELLED` rows instead of failing on duplicate key. Implemented in `apps/web/src/services/subscription.service.ts`.
 
 ### Subscriptions for an event
 

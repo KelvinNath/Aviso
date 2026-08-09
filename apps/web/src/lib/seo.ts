@@ -7,7 +7,7 @@ export const siteConfig = {
   name: "Aviso",
   tagline: "We remember the deadlines. You remember the syllabus.",
   description:
-    "Official exam updates with unofficial personality. Stop refreshing NTA every 15 minutes.",
+    "Track JEE, BITSAT, COMEDK, and state entrances from official sources. Telegram alerts when admit cards, dates, and results drop.",
   url: siteUrl,
   ogImage: `${siteUrl}/opengraph-image`,
   twitterHandle: "@avisoapp",

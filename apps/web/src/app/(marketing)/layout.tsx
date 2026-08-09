@@ -4,13 +4,13 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteNav } from "@/components/layout/site-nav";
 
 export const metadata = createMetadata({
-  title: "Stop refreshing NTA",
+  title: "Official exam alerts on Telegram",
   description:
-    "Official exam updates with unofficial personality. Stop refreshing NTA every 15 minutes.",
+    "Track JEE, BITSAT, COMEDK, and state entrances from official sources. Get Telegram alerts when admit cards, dates, and results drop.",
   openGraph: {
-    title: "Aviso — Stop refreshing NTA",
+    title: "Aviso — Exam alerts without the refresh marathon",
     description:
-      "Get official JEE and entrance exam updates on Telegram. No more F5.",
+      "Official updates for engineering entrances, delivered on Telegram when they actually matter.",
   },
 });
 

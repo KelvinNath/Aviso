@@ -129,6 +129,8 @@ When a new event is stored:
 - A user may subscribe to multiple exams.
 - At most one subscription per `(userId, examId)` pair.
 - Cancelling sets status to `CANCELLED` (not hard delete).
+- Re-subscribing to a cancelled exam upserts the same row and sets status back to `ACTIVE` with updated `eventTypes`.
+- Event type preferences can be updated via PATCH without cancelling.
 
 ### Telegram linking
 
@@ -139,8 +141,9 @@ When a new event is stored:
 
 ### Dashboard notification history
 
-- Shows notifications for the logged-in user's active subscriptions.
+- Shows notifications for the logged-in user's active subscriptions at `/dashboard/notifications`.
 - Same records as the Telegram pipeline — not a separate inbox.
+- **Actionable filter:** events with a past `effectiveDate` are hidden; result/answer-key events use freshness rules instead.
 - Filterable by exam slug and event type; paginated.
 
 ## User journeys
@@ -148,15 +151,15 @@ When a new event is stored:
 ### New student
 
 1. Land on marketing site → sign in with Google
-2. Onboarding: pick exam + event types → subscription created
-3. Connect Telegram (optional but required for Telegram delivery)
-4. Receive alerts on Telegram; view history on dashboard
+2. Track wizard at `/dashboard/track`: pick exam → choose event types → save
+3. Connect Telegram on dashboard (optional but required for Telegram delivery)
+4. Receive alerts on Telegram; browse actionable history at `/dashboard/notifications`
 
 ### Returning student
 
-1. Sign in → dashboard
-2. Manage subscriptions, connect/disconnect Telegram (disconnect coming soon)
-3. Browse **My Notifications** with filters
+1. Sign in → dashboard control panel
+2. Edit tracking preferences via modal, stop/re-add exams, connect Telegram
+3. Browse **My Notifications** at `/dashboard/notifications` with filters
 
 ### Bot-only user (legacy path)
 

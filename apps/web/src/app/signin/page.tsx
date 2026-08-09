@@ -30,8 +30,8 @@ export default function SignInPage() {
           </div>
 
           <p className="mt-4 font-body text-base leading-relaxed opacity-80">
-            Sign in to pick your exams and stop refreshing NTA like it&apos;s a
-            hobby.
+            Sign in to pick your exams and get official updates on Telegram —
+            without the portal refresh marathon.
           </p>
 
           <div className="mt-8">

@@ -4,7 +4,6 @@ import { AvisoLogo } from "@/components/layout/aviso-logo";
 import { Container } from "@/components/layout/container";
 
 const footerLinks = [
-  { href: "/design-system", label: "Design System" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ] as const;
