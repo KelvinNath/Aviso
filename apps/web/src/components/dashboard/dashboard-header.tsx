@@ -10,12 +10,14 @@ type DashboardHeaderProps = {
   displayName: string | null;
   email: string;
   avatarUrl: string | null;
+  hasSubscriptions: boolean;
 };
 
 export function DashboardHeader({
   displayName,
   email,
   avatarUrl,
+  hasSubscriptions,
 }: DashboardHeaderProps) {
   const label = displayName ?? email;
 
@@ -27,7 +29,7 @@ export function DashboardHeader({
             <Link href="/dashboard" className="inline-flex shrink-0 items-center">
               <AvisoLogo />
             </Link>
-            <DashboardNav />
+            <DashboardNav hasSubscriptions={hasSubscriptions} />
           </div>
 
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">

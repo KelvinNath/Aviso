@@ -3,7 +3,7 @@ import * as cheerio from "cheerio";
 import type { ParsedEvent } from "../types/parsed-event.js";
 import { shouldIncludeKcetAnnouncement } from "./kcet/scope-filter.js";
 import { classifyAnnouncementTitle } from "./shared/classify-announcement.js";
-import { shouldIncludeCycleAnnouncement, EXAM_CYCLE_YEAR } from "./shared/cycle-filter.js";
+import { shouldIncludeCycleAnnouncement, getExamCycleYear } from "./shared/cycle-filter.js";
 import { normalizeText } from "./shared/normalize-title.js";
 import type { Parser } from "./parser.js";
 
@@ -48,9 +48,10 @@ export class KcetParser implements Parser {
             return;
           }
 
-          const displayTitle = title.includes(String(EXAM_CYCLE_YEAR))
+          const cycleYear = getExamCycleYear();
+          const displayTitle = title.includes(String(cycleYear))
             ? title
-            : `KCET ${EXAM_CYCLE_YEAR} — ${title}`;
+            : `KCET ${cycleYear} — ${title}`;
 
           if (!shouldIncludeCycleAnnouncement(displayTitle)) {
             return;

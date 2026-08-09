@@ -1,11 +1,9 @@
 import { EventType, ExamCyclePhase } from "@prisma/client";
+import { getExamCycleYear } from "@aviso/shared-utils";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import {
-  CURRENT_CYCLE_YEAR,
-  getCurrentCyclePhase,
-} from "@/services/exam.service";
+import { getCurrentCyclePhase } from "@/services/exam.service";
 import {
   createSubscription,
   findSubscriptionsByUserId,
@@ -75,7 +73,7 @@ export async function POST(request: Request) {
 
     if (cyclePhase === ExamCyclePhase.COMPLETE) {
       return NextResponse.json(
-        { error: `${CURRENT_CYCLE_YEAR} cycle has ended for this exam` },
+        { error: `${getExamCycleYear()} cycle has ended for this exam` },
         { status: 400 },
       );
     }

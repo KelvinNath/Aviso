@@ -1,9 +1,11 @@
 import { ExamCyclePhase, ExamStatus, PrismaClient } from "@prisma/client";
+import { getExamCycleYear } from "@aviso/shared-utils";
+import { config } from "dotenv";
+import { resolve } from "node:path";
+
+config({ path: resolve(process.cwd(), ".env") });
 
 const prisma = new PrismaClient();
-
-/** Matches EXAM_CYCLE_YEAR in apps/crawler cycle-filter. */
-const CURRENT_CYCLE_YEAR = 2026;
 
 type ExamSeed = {
   name: string;
@@ -166,6 +168,7 @@ async function upsertExamCycle(
   examId: string,
   cycleSeed: NonNullable<ExamSeed["cycle"]>,
 ): Promise<void> {
+  const cycleYear = getExamCycleYear();
   const milestones = {
     registrationClose: cycleSeed.registrationClose ?? null,
     examDate: cycleSeed.examDate ?? null,
@@ -183,12 +186,12 @@ async function upsertExamCycle(
     where: {
       examId_cycleYear: {
         examId,
-        cycleYear: CURRENT_CYCLE_YEAR,
+        cycleYear,
       },
     },
     create: {
       examId,
-      cycleYear: CURRENT_CYCLE_YEAR,
+      cycleYear,
       phase,
       ...milestones,
       completedAt:

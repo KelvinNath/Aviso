@@ -1,16 +1,3 @@
-export const supportedExams = [
-  { name: "JEE Main", slug: "jee-main", status: "live" as const },
-  { name: "JEE Advanced", slug: "jee-advanced", status: "live" as const },
-  { name: "BITSAT", slug: "bitsat", status: "live" as const },
-  { name: "COMEDK UGET", slug: "comedk-uget", status: "live" as const },
-  { name: "WBJEE", slug: "wbjee", status: "live" as const },
-  { name: "MHT CET", slug: "mht-cet", status: "live" as const },
-  { name: "KCET", slug: "kcet", status: "live" as const },
-  { name: "VITEEE", slug: "viteee", status: "live" as const },
-  { name: "MET", slug: "met", status: "live" as const },
-  { name: "SRMJEEE", slug: "srmjeee", status: "live" as const },
-] as const;
-
 export const howItWorksSteps = [
   {
     step: "01",

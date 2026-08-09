@@ -4,8 +4,8 @@ import {
   type ExamCycle,
   type Event,
 } from "@prisma/client";
+import { getExamCycleYear } from "@aviso/shared-utils";
 
-import { EXAM_CYCLE_YEAR } from "../crawler/parsers/shared/cycle-filter.js";
 import { prisma } from "../lib/prisma.js";
 
 const POST_EXAM_COMPLETE_DAYS = 90;
@@ -120,13 +120,15 @@ function deriveMilestonesFromEvents(
 
 export async function getCurrentExamCycle(
   examId: string,
-  cycleYear: number = EXAM_CYCLE_YEAR,
+  cycleYear?: number,
 ): Promise<ExamCycle | null> {
+  const year = cycleYear ?? getExamCycleYear();
+
   return prisma.examCycle.findUnique({
     where: {
       examId_cycleYear: {
         examId,
-        cycleYear,
+        cycleYear: year,
       },
     },
   });
@@ -134,9 +136,10 @@ export async function getCurrentExamCycle(
 
 export async function syncExamCycleFromEvents(
   examId: string,
-  cycleYear: number = EXAM_CYCLE_YEAR,
+  cycleYear?: number,
 ): Promise<ExamCycleMilestones> {
-  const existing = await getCurrentExamCycle(examId, cycleYear);
+  const year = cycleYear ?? getExamCycleYear();
+  const existing = await getCurrentExamCycle(examId, year);
 
   const events = await prisma.event.findMany({
     where: { examId },
@@ -149,7 +152,7 @@ export async function syncExamCycleFromEvents(
     },
   });
 
-  const cycleEvents = events.filter((event) => isEventInCycle(event, cycleYear));
+  const cycleEvents = events.filter((event) => isEventInCycle(event, year));
 
   return deriveMilestonesFromEvents(cycleEvents, {
     registrationClose: existing?.registrationClose ?? null,
@@ -160,12 +163,13 @@ export async function syncExamCycleFromEvents(
 
 export async function refreshExamCycle(
   examId: string,
-  cycleYear: number = EXAM_CYCLE_YEAR,
+  cycleYear?: number,
   now: Date = new Date(),
 ): Promise<ExamCycle> {
-  const milestones = await syncExamCycleFromEvents(examId, cycleYear);
+  const year = cycleYear ?? getExamCycleYear();
+  const milestones = await syncExamCycleFromEvents(examId, year);
   const nextPhase = computeExamCyclePhase(milestones, now);
-  const existing = await getCurrentExamCycle(examId, cycleYear);
+  const existing = await getCurrentExamCycle(examId, year);
 
   const completedAt =
     nextPhase === ExamCyclePhase.COMPLETE
@@ -176,12 +180,12 @@ export async function refreshExamCycle(
     where: {
       examId_cycleYear: {
         examId,
-        cycleYear,
+        cycleYear: year,
       },
     },
     create: {
       examId,
-      cycleYear,
+      cycleYear: year,
       phase: nextPhase,
       registrationClose: milestones.registrationClose,
       examDate: milestones.examDate,
@@ -198,4 +202,4 @@ export async function refreshExamCycle(
   });
 }
 
-export { EXAM_CYCLE_YEAR };
+export { getExamCycleYear };

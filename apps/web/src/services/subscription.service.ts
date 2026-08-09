@@ -1,6 +1,6 @@
 import { SubscriptionStatus, type EventType } from "@prisma/client";
+import { getExamCycleYear } from "@aviso/shared-utils";
 
-import { CURRENT_CYCLE_YEAR } from "@/services/exam.service";
 import { prisma } from "@/lib/prisma";
 
 type CreateSubscriptionInput = {
@@ -37,6 +37,8 @@ export async function createSubscription(input: CreateSubscriptionInput) {
  * Returns active subscriptions for a user, newest first, with selected exam fields.
  */
 export async function findSubscriptionsByUserId(userId: string) {
+  const cycleYear = getExamCycleYear();
+
   return prisma.subscription.findMany({
     where: {
       userId,
@@ -56,7 +58,7 @@ export async function findSubscriptionsByUserId(userId: string) {
           name: true,
           slug: true,
           cycles: {
-            where: { cycleYear: CURRENT_CYCLE_YEAR },
+            where: { cycleYear },
             select: {
               phase: true,
               cycleYear: true,
@@ -91,25 +93,27 @@ export async function cancelSubscription(
   });
 }
 
-const subscriptionDetailSelect = {
-  id: true,
-  eventTypes: true,
-  exam: {
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      cycles: {
-        where: { cycleYear: CURRENT_CYCLE_YEAR },
-        select: {
-          phase: true,
-          cycleYear: true,
+function subscriptionDetailSelect(cycleYear: number) {
+  return {
+    id: true,
+    eventTypes: true,
+    exam: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        cycles: {
+          where: { cycleYear },
+          select: {
+            phase: true,
+            cycleYear: true,
+          },
+          take: 1,
         },
-        take: 1,
       },
     },
-  },
-} as const;
+  } as const;
+}
 
 /**
  * Returns an active subscription owned by the user, or null.
@@ -124,7 +128,7 @@ export async function findSubscriptionByIdForUser(
       userId,
       status: SubscriptionStatus.ACTIVE,
     },
-    select: subscriptionDetailSelect,
+    select: subscriptionDetailSelect(getExamCycleYear()),
   });
 }
 
@@ -151,6 +155,6 @@ export async function updateSubscriptionEventTypes(
   return prisma.subscription.update({
     where: { id: subscriptionId },
     data: { eventTypes },
-    select: subscriptionDetailSelect,
+    select: subscriptionDetailSelect(getExamCycleYear()),
   });
 }

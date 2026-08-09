@@ -1,7 +1,4 @@
-/**
- * Current exam cycle year. Update at the start of each admissions cycle.
- */
-export const EXAM_CYCLE_YEAR = 2026;
+import { getExamCycleYear } from "@aviso/shared-utils";
 
 const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
 
@@ -13,13 +10,15 @@ export function shouldIncludeCycleAnnouncement(
   title: string,
   publishedAt?: Date,
   now: Date = new Date(),
-  cycleYear: number = EXAM_CYCLE_YEAR,
+  cycleYear?: number,
 ): boolean {
+  const year = cycleYear ?? getExamCycleYear(now);
+
   if (!title.trim()) {
     return false;
   }
 
-  if (title.includes(String(cycleYear))) {
+  if (title.includes(String(year))) {
     return true;
   }
 
@@ -29,3 +28,5 @@ export function shouldIncludeCycleAnnouncement(
 
   return now.getTime() - publishedAt.getTime() <= TWELVE_MONTHS_MS;
 }
+
+export { getExamCycleYear };

@@ -1,11 +1,7 @@
 import { ExamCyclePhase, type Event } from "@prisma/client";
+import { getExamCycleYear, isActionableEvent } from "@aviso/shared-utils";
 
-import { isActionableEvent } from "@aviso/shared-utils";
-
-import {
-  EXAM_CYCLE_YEAR,
-  getCurrentExamCycle,
-} from "./exam-cycle.service.js";
+import { getCurrentExamCycle } from "./exam-cycle.service.js";
 
 /**
  * Returns true when a stored event should trigger user notifications.
@@ -37,6 +33,6 @@ export async function shouldNotifyForEvent(
   event: Event,
   now: Date = new Date(),
 ): Promise<boolean> {
-  const cycle = await getCurrentExamCycle(event.examId, EXAM_CYCLE_YEAR);
+  const cycle = await getCurrentExamCycle(event.examId, getExamCycleYear(now));
   return shouldNotifyForEventWithCycle(event, cycle?.phase, now);
 }

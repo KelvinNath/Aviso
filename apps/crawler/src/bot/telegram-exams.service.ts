@@ -1,19 +1,21 @@
 import { ExamCyclePhase, ExamStatus, SubscriptionStatus } from "@prisma/client";
+import { getExamCycleYear } from "@aviso/shared-utils";
 
-import { EXAM_CYCLE_YEAR } from "../services/exam-cycle.service.js";
 import { prisma } from "../lib/prisma.js";
 
 /**
  * Returns all exams available for subscription (ACTIVE status, live cycle only).
  */
 export async function listActiveExams() {
+  const cycleYear = getExamCycleYear();
+
   return prisma.exam.findMany({
     where: {
       status: ExamStatus.ACTIVE,
       NOT: {
         cycles: {
           some: {
-            cycleYear: EXAM_CYCLE_YEAR,
+            cycleYear,
             phase: ExamCyclePhase.COMPLETE,
           },
         },

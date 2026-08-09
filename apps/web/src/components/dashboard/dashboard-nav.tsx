@@ -6,13 +6,9 @@ import { usePathname } from "next/navigation";
 import { copy } from "@/lib/copy";
 import { cn } from "@/lib/cn";
 
-const NAV_LINKS = [
-  { href: "/dashboard", label: copy.dashboard.navDashboard },
-  {
-    href: "/dashboard/notifications",
-    label: copy.dashboard.navNotifications,
-  },
-] as const;
+type DashboardNavProps = {
+  hasSubscriptions: boolean;
+};
 
 function isActivePath(pathname: string, href: string): boolean {
   if (href === "/dashboard") {
@@ -22,15 +18,27 @@ function isActivePath(pathname: string, href: string): boolean {
   return pathname.startsWith(href);
 }
 
-export function DashboardNav() {
+export function DashboardNav({ hasSubscriptions }: DashboardNavProps) {
   const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/dashboard", label: copy.dashboard.navDashboard },
+    ...(hasSubscriptions
+      ? [
+          {
+            href: "/dashboard/notifications",
+            label: copy.dashboard.navNotifications,
+          },
+        ]
+      : []),
+  ] as const;
 
   return (
     <nav
       aria-label="Dashboard"
       className="flex items-center gap-1 overflow-x-auto"
     >
-      {NAV_LINKS.map((link) => {
+      {navLinks.map((link) => {
         const active = isActivePath(pathname, link.href);
 
         return (

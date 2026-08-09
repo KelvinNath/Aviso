@@ -6,12 +6,15 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { TelegramPreviewSection } from "@/components/landing/telegram-preview-section";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
+import { getExamsForMarketing } from "@/services/exam.service";
 
-export default function Home() {
+export default async function Home() {
+  const exams = await getExamsForMarketing();
+
   return (
     <main>
       <HeroSection />
-      <ExamsSection />
+      <ExamsSection exams={exams} />
       <HowItWorksSection />
       <FeaturesSection />
       <TelegramPreviewSection />

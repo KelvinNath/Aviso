@@ -7,9 +7,10 @@ import {
   type Prisma,
 } from "@prisma/client";
 
+import { getExamCycleYear } from "@aviso/shared-utils";
+
 import { getActionableEventCutoffs, isActionableEvent } from "@/lib/is-actionable-event";
 import { prisma } from "@/lib/prisma";
-import { CURRENT_CYCLE_YEAR } from "@/services/exam.service";
 import type {
   DashboardNotification,
   GetNotificationsOptions,
@@ -61,6 +62,7 @@ function toDashboardNotification(
 
 function buildActionableEventWhere(now: Date = new Date()): Prisma.EventWhereInput {
   const { freshPublishCutoff } = getActionableEventCutoffs(now);
+  const cycleYear = getExamCycleYear(now);
 
   return {
     notifyPolicy: { not: NotifyPolicy.REFERENCE },
@@ -68,7 +70,7 @@ function buildActionableEventWhere(now: Date = new Date()): Prisma.EventWhereInp
       NOT: {
         cycles: {
           some: {
-            cycleYear: CURRENT_CYCLE_YEAR,
+            cycleYear,
             phase: ExamCyclePhase.COMPLETE,
           },
         },

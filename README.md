@@ -47,7 +47,7 @@ Generate an auth secret (use `AUTH_SECRET`, not `BETTER_AUTH_SECRET`):
 npx auth secret
 ```
 
-Key variables: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_URL`, `BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`.
+Key variables: `DATABASE_URL`, `EXAM_CYCLE_YEAR`, `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_URL`, `BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`.
 
 The web app loads env from the **repo root** via `apps/web/next.config.ts`.
 

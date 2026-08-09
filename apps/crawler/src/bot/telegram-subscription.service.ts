@@ -5,8 +5,8 @@ import {
   SubscriptionStatus,
   type Exam,
 } from "@prisma/client";
+import { getExamCycleYear } from "@aviso/shared-utils";
 
-import { EXAM_CYCLE_YEAR } from "../services/exam-cycle.service.js";
 import { prisma } from "../lib/prisma.js";
 
 export const DEFAULT_BOT_EVENT_TYPES = [
@@ -116,11 +116,12 @@ export async function subscribeToExam(
     return { status: "exam_not_active", examName: exam.name, slug: exam.slug };
   }
 
+  const cycleYear = getExamCycleYear();
   const cycle = await prisma.examCycle.findUnique({
     where: {
       examId_cycleYear: {
         examId: exam.id,
-        cycleYear: EXAM_CYCLE_YEAR,
+        cycleYear,
       },
     },
   });
@@ -130,7 +131,7 @@ export async function subscribeToExam(
       status: "cycle_ended",
       examName: exam.name,
       slug: exam.slug,
-      cycleYear: EXAM_CYCLE_YEAR,
+      cycleYear,
     };
   }
 

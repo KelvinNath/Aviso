@@ -7,3 +7,4 @@ export {
   type EventRelevanceInput,
   type NotifyPolicy,
 } from "./event-relevance";
+export { getExamCycleYear } from "./exam-cycle-year";
