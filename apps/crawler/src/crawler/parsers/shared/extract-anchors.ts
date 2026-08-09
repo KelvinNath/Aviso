@@ -18,6 +18,7 @@ function parseAnchor(
   title: string,
   baseUrl: string,
   classifyFn: (title: string) => EventType,
+  cycleFilter?: (title: string) => boolean,
 ): ParsedEvent | undefined {
   if (!href || !title) {
     return undefined;
@@ -26,6 +27,10 @@ function parseAnchor(
   const normalizedTitle = normalizeText(title);
 
   if (!normalizedTitle || normalizedTitle.toLowerCase() === "view all") {
+    return undefined;
+  }
+
+  if (cycleFilter && !cycleFilter(normalizedTitle)) {
     return undefined;
   }
 
@@ -51,6 +56,7 @@ type ExtractAnchorAnnouncementsOptions = {
   selectors: readonly string[];
   baseUrl: string;
   classifyFn: (title: string) => EventType;
+  cycleFilter?: (title: string) => boolean;
 };
 
 /**
@@ -71,6 +77,7 @@ export function extractAnchorAnnouncements(
         anchor.text(),
         options.baseUrl,
         options.classifyFn,
+        options.cycleFilter,
       );
 
       if (!parsed || seenUrls.has(parsed.sourceUrl)) {

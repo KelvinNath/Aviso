@@ -8,6 +8,7 @@ loadEnvConfig(path.join(__dirname, "../.."));
 const nextConfig: NextConfig = {
   // Required in monorepos so Next.js traces dependencies outside apps/web
   outputFileTracingRoot: path.join(__dirname, "../../"),
+  transpilePackages: ["@aviso/shared-utils"],
 };
 
 export default nextConfig;

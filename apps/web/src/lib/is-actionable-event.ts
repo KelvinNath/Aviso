@@ -1,9 +1,8 @@
 export {
   FRESH_PUBLISH_GRACE_MS,
-  LATE_DISCOVERY_GRACE_MS,
   getActionableEventCutoffs,
   isActionableEvent,
-  type ActionableEventFilterInput,
+  LATE_DISCOVERY_GRACE_MS,
   type EventRelevanceInput,
   type NotifyPolicy,
-} from "./event-relevance";
+} from "@aviso/shared-utils";

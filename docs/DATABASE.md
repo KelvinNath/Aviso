@@ -51,6 +51,7 @@ PostgreSQL database managed by Prisma. Schema: [`prisma/schema.prisma`](../prism
 | `publishedAt` | `DateTime?` | Official publish date if known |
 | `detectedAt` | `DateTime` | When crawler found it |
 | `effectiveDate` | `DateTime?` | Relevant date (deadline, exam date) |
+| `notifyPolicy` | `NotifyPolicy` | `ALERT` (notify/display) or `REFERENCE` (ingest only) |
 
 **Unique:** `fingerprint`  
 **Index:** `(examId, createdAt)`

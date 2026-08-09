@@ -1,10 +1,12 @@
 import {
   EventType,
   NotificationStatus,
+  NotifyPolicy,
   SubscriptionStatus,
   type Prisma,
 } from "@prisma/client";
 
+import { getActionableEventCutoffs } from "@/lib/is-actionable-event";
 import { prisma } from "@/lib/prisma";
 import type {
   DashboardNotification,
@@ -48,6 +50,22 @@ function toDashboardNotification(
   };
 }
 
+function buildActionableEventWhere(now: Date = new Date()): Prisma.EventWhereInput {
+  const { freshPublishCutoff } = getActionableEventCutoffs(now);
+
+  return {
+    notifyPolicy: { not: NotifyPolicy.REFERENCE },
+    AND: [
+      {
+        OR: [{ effectiveDate: null }, { effectiveDate: { gte: now } }],
+      },
+      {
+        OR: [{ publishedAt: null }, { publishedAt: { gte: freshPublishCutoff } }],
+      },
+    ],
+  };
+}
+
 function buildWhereClause(
   userId: string,
   options: GetNotificationsOptions,
@@ -61,15 +79,21 @@ function buildWhereClause(
     subscriptionWhere.exam = { slug: options.examSlug };
   }
 
-  const where: Prisma.NotificationWhereInput = {
-    subscription: subscriptionWhere,
-  };
+  const eventFilters: Prisma.EventWhereInput[] = [buildActionableEventWhere()];
 
   if (options.eventTypes && options.eventTypes.length > 0) {
-    where.event = {
-      type: { in: options.eventTypes },
-    };
+    eventFilters.push({ type: { in: options.eventTypes } });
   }
+
+  const where: Prisma.NotificationWhereInput = {
+    subscription: subscriptionWhere,
+    event:
+      eventFilters.length === 1
+        ? eventFilters[0]
+        : {
+            AND: eventFilters,
+          },
+  };
 
   return where;
 }

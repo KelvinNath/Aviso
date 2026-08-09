@@ -1,4 +1,5 @@
 import { createNotificationsForEvent } from "../services/notification.service.js";
+import { shouldNotifyForEvent } from "../services/should-notify-for-event.js";
 import { ingestEvents } from "../services/event.service.js";
 import { getParser } from "./parser.factory.js";
 
@@ -58,6 +59,10 @@ export async function crawlExamSource(
     let notificationsQueued = 0;
 
     for (const event of newEvents) {
+      if (!shouldNotifyForEvent(event)) {
+        continue;
+      }
+
       const { createdCount } = await createNotificationsForEvent(event);
       notificationsQueued += createdCount;
     }

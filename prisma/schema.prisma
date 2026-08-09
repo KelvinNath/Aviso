@@ -38,6 +38,11 @@ enum NotificationStatus {
   FAILED
 }
 
+enum NotifyPolicy {
+  ALERT
+  REFERENCE
+}
+
 model Exam {
   id        String     @id @default(cuid())
   name      String
@@ -78,6 +83,7 @@ model Event {
   publishedAt   DateTime?
   detectedAt    DateTime
   effectiveDate DateTime?
+  notifyPolicy  NotifyPolicy @default(ALERT)
   createdAt     DateTime  @default(now())
 
   exam          Exam           @relation(fields: [examId], references: [id])

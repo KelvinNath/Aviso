@@ -2,6 +2,7 @@ import * as cheerio from "cheerio";
 
 import type { ParsedEvent } from "../types/parsed-event.js";
 import { classifyAnnouncementTitle } from "./shared/classify-announcement.js";
+import { shouldIncludeCycleAnnouncement } from "./shared/cycle-filter.js";
 import { extractAnchorAnnouncements } from "./shared/extract-anchors.js";
 import type { Parser } from "./parser.js";
 
@@ -27,6 +28,7 @@ export class JeeParser implements Parser {
         selectors: ANNOUNCEMENT_SELECTORS,
         baseUrl: BASE_URL,
         classifyFn: classifyAnnouncementTitle,
+        cycleFilter: (title) => shouldIncludeCycleAnnouncement(title),
       });
     } catch {
       return [];

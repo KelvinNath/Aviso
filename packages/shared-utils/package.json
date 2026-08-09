@@ -10,8 +10,13 @@
     }
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
   }
 }

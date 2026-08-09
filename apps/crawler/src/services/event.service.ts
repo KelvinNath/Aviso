@@ -46,6 +46,7 @@ export async function ingestEvents(
           sourceUrl: parsed.sourceUrl,
           fingerprint,
           publishedAt: parsed.publishedAt ?? null,
+          notifyPolicy: parsed.notifyPolicy ?? "ALERT",
           detectedAt: new Date(),
         },
       });

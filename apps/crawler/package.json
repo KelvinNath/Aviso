@@ -13,6 +13,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@aviso/shared-utils": "*",
     "@prisma/client": "^6.12.0",
     "cheerio": "^1.2.0",
     "dotenv": "^16.6.1",

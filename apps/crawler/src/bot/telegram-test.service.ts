@@ -1,4 +1,4 @@
-import { EventType, type Event } from "@prisma/client";
+import { EventType, NotifyPolicy, type Event } from "@prisma/client";
 
 import { sendMessage } from "../adapters/telegram.adapter.js";
 import { prisma } from "../lib/prisma.js";
@@ -124,6 +124,7 @@ function buildMockEvent(examId: string, type: EventType): Event {
     publishedAt: now,
     detectedAt: now,
     effectiveDate: null,
+    notifyPolicy: NotifyPolicy.ALERT,
     createdAt: now,
   };
 }

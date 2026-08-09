@@ -3,6 +3,7 @@ import type { Element } from "domhandler";
 
 import type { ParsedEvent } from "../types/parsed-event.js";
 import { shouldIncludeJeeAdvancedAnnouncement } from "./jee-advanced/cycle-filter.js";
+import { getJeeAdvancedNotifyPolicy } from "./jee-advanced/notify-policy.js";
 import { classifyAnnouncementTitle } from "./shared/classify-announcement.js";
 import { normalizeText } from "./shared/normalize-title.js";
 import type { Parser } from "./parser.js";
@@ -103,6 +104,7 @@ function parseAnnouncementBlock($block: CheerioBlock): ParsedEvent | undefined {
     summary: extractSummary($block),
     sourceUrl: extractSourceUrl($block, title),
     publishedAt,
+    notifyPolicy: getJeeAdvancedNotifyPolicy(title),
   };
 }
 
