@@ -53,12 +53,12 @@ export const features = [
     emoji: "🔔",
   },
   {
-    title: "No tab-hopping",
+    title: "Only what's live",
     description:
-      "Close the dozen admission sites you have bookmarked. We'll tell you when something changes.",
-    variant: "lime" as const,
+      "Close the bookmark folder. Stale deadlines disappear — we surface official updates that still matter today.",
+    variant: "sky" as const,
     tilt: "left" as const,
-    emoji: "⚡",
+    emoji: "📌",
   },
   {
     title: "Per-exam control",

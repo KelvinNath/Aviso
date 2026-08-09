@@ -22,15 +22,15 @@ export function FeaturesSection() {
         </SectionHeader>
       </Reveal>
 
-      <StaggerReveal className="grid gap-6 sm:grid-cols-2">
+      <StaggerReveal className="grid auto-rows-fr gap-6 sm:grid-cols-2">
         {features.map((feature) => (
-          <StaggerItem key={feature.title}>
-            <HoverLift>
+          <StaggerItem key={feature.title} className="min-h-[168px]">
+            <HoverLift className="h-full">
               <Card
                 variant={feature.variant}
                 tilt={feature.tilt}
                 shadow="lg"
-                className="relative h-full overflow-hidden"
+                className="relative flex h-full min-h-[168px] flex-col overflow-hidden"
               >
                 <span
                   aria-hidden="true"
