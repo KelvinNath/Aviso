@@ -10,7 +10,7 @@ export function Label({ className, children, ...props }: LabelProps) {
   return (
     <label
       className={cn(
-        "block font-heading text-sm font-bold uppercase tracking-wide",
+        "block font-heading text-sm font-bold uppercase tracking-wide text-aviso-dark dark:text-aviso-light",
         className,
       )}
       {...props}

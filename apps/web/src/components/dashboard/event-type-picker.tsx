@@ -67,7 +67,7 @@ function EventTypeToggle({ option, isChecked, onToggle }: EventTypeToggleProps) 
         "flex items-center gap-3 rounded-chunky brutal-border px-4 py-3 text-left text-sm transition-colors",
         isChecked
           ? "bg-aviso-purple text-aviso-light brutal-shadow-sm"
-          : "bg-aviso-light hover:bg-aviso-sky/30 dark:bg-aviso-dark",
+          : "bg-aviso-light text-aviso-dark hover:bg-aviso-sky/30 dark:bg-aviso-light/10 dark:text-aviso-light dark:hover:bg-aviso-sky/20",
       )}
     >
       <span aria-hidden="true">{option.emoji}</span>

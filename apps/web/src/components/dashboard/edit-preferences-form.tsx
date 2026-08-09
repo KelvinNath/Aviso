@@ -95,7 +95,7 @@ export function EditPreferencesForm({
   return (
     <div className="space-y-6">
       {error && (
-        <p className="rounded-chunky brutal-border bg-aviso-coral/20 px-4 py-3 font-body text-sm">
+        <p className="rounded-chunky brutal-border bg-aviso-coral/20 px-4 py-3 font-body text-sm text-aviso-dark dark:text-aviso-light">
           {error}
         </p>
       )}

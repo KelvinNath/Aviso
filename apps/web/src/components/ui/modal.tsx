@@ -74,7 +74,7 @@ export function Modal({
       }}
       onClick={handleBackdropClick}
       className={cn(
-        "z-50 m-auto max-h-[90vh] w-[min(calc(100%-2rem),42rem)] overflow-hidden rounded-sticker brutal-border bg-aviso-light p-0 brutal-shadow backdrop:bg-aviso-dark/60 open:flex open:flex-col dark:bg-aviso-dark",
+        "z-50 m-auto max-h-[90vh] w-[min(calc(100%-2rem),42rem)] overflow-hidden rounded-sticker brutal-border bg-aviso-light p-0 text-aviso-dark brutal-shadow backdrop:bg-aviso-dark/60 open:flex open:flex-col dark:bg-aviso-dark dark:text-aviso-light",
         className,
       )}
     >
@@ -94,7 +94,7 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-chunky brutal-border px-3 py-1 font-heading text-sm font-bold uppercase hover:bg-aviso-coral/30"
+            className="rounded-chunky brutal-border px-3 py-1 font-heading text-sm font-bold uppercase text-aviso-dark hover:bg-aviso-coral/30 dark:text-aviso-light"
             aria-label="Close"
           >
             ×
